@@ -13,6 +13,8 @@ import { configValidationSchema } from './config.schema';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { PaymentsModule } from './payments/payments.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -44,6 +46,12 @@ import { PaymentsModule } from './payments/payments.module';
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 750,
+      },
+    ]),
     ProductsModule,
     CategoriesModule,
     CartModule,
@@ -52,6 +60,12 @@ import { PaymentsModule } from './payments/payments.module';
     OrdersModule,
     SyncModule,
     PaymentsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

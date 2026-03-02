@@ -68,7 +68,7 @@ const RegisterScreen: React.FC = () => {
         color: "success",
       });
       setStep(2);
-      setTimeLeft(30);
+      setTimeLeft(300);
     } catch (error: any) {
       presentToast({
         message: error.response?.data?.message || "Помилка відправки коду",

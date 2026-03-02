@@ -27,6 +27,7 @@ import { RequestVerificationCodeDto } from './dto/req-code.dto';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtPayload } from './jwt-payload.interface';
 import { RefreshPasswordDto } from './dto/refresh-password.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +46,7 @@ export class AuthController {
     return this.authService.findOne(req.user.id);
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('/send-code')
   sendCode(
     @Body() requestVerificationCodeDto: RequestVerificationCodeDto,
@@ -62,6 +64,7 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('/signin')
   signIn(
     @Body() signInDto: SignInDto,

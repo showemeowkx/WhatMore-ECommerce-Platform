@@ -2,6 +2,8 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -111,6 +113,28 @@ export class AuthService {
       throw new ConflictException('Цей номер не зареєстрований.');
     }
 
+    const lastCode = await this.verificationCodeRepository.findOne({
+      where: { phone },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (lastCode) {
+      const minutesOld =
+        (Date.now() - lastCode.createdAt.getTime()) / 1000 / 60;
+      if (minutesOld < 5) {
+        const remainingSeconds = Math.ceil((5 - minutesOld) * 60);
+        const minLeft = Math.floor(remainingSeconds / 60);
+        const secLeft = remainingSeconds % 60;
+        const timeLeftStr =
+          minLeft > 0 ? `${minLeft} хв ${secLeft} сек` : `${secLeft} сек`;
+
+        throw new HttpException(
+          `СМС вже відправлено. Зачекайте ${timeLeftStr} перед повторною відправкою.`,
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+    }
+
     const rawCode = crypto.randomInt(100000, 999999).toString();
     const hashedCode = await bcrypt.hash(rawCode, 10);
 
@@ -124,9 +148,7 @@ export class AuthService {
     if (this.configService.get<string>('NODE_ENV') !== 'prod') {
       this.smsService.sendVerificationCodeMock(phone, rawCode);
     } else {
-      const expiresIn =
-        this.configService.get<number>('VERIFICATION_CODE_EXPIRE_MINUTES') || 5;
-      const text = `Ваш код для реєстрації "Що? Ще?": ${rawCode},\nДійсний протягом ${expiresIn} хвилин.`;
+      const text = `Ваш код для реєстрації "Що? Ще?": ${rawCode},\nДійсний протягом 5 хвилин.`;
       await this.smsService.sendSms(phone, text);
     }
   }
