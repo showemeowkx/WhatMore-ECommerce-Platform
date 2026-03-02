@@ -86,6 +86,7 @@ const AdminOrderItemCard = ({
       <img
         src={item.productImagePath}
         alt={item.productName}
+        loading="lazy"
         className="w-full h-full object-contain mix-blend-multiply"
       />
     </div>

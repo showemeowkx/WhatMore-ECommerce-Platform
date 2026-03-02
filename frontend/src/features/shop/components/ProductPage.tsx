@@ -416,6 +416,7 @@ const ProductScreen: React.FC = () => {
                 <img
                   src={product.imagePath}
                   alt={product.name}
+                  loading="lazy"
                   className={`max-w-full max-h-[400px] object-contain mix-blend-multiply ${isUnavailable ? "opacity-50 grayscale" : ""}`}
                 />
               ) : (
@@ -518,6 +519,7 @@ const ProductScreen: React.FC = () => {
               <img
                 src={product.imagePath}
                 alt={product.name}
+                loading="lazy"
                 className={`w-full h-full object-contain mix-blend-multiply ${isUnavailable ? "opacity-50 grayscale" : ""}`}
               />
             ) : (

@@ -89,7 +89,12 @@ const SmallProductCard: React.FC<SmallProductCardProps> = ({
     >
       <div className="w-14 h-14 shrink-0 rounded-xl bg-gray-50 flex items-center justify-center relative overflow-hidden">
         {image ? (
-          <img src={image} alt={name} className="w-full h-full object-cover" />
+          <img
+            src={image}
+            alt={name}
+            loading="lazy"
+            className="w-full h-full object-contain p-1 mix-blend-multiply"
+          />
         ) : (
           <span className="text-lg opacity-20">📷</span>
         )}

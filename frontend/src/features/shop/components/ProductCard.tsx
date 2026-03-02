@@ -42,7 +42,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <div className="aspect-[1/0.9] bg-gray-50 rounded-[18px] mb-2 overflow-hidden flex items-center justify-center relative">
         {image ? (
-          <img src={image} alt={name} className="w-full h-full object-cover" />
+          <img
+            src={image}
+            alt={name}
+            loading="lazy"
+            className="w-full h-full object-contain p-2 mix-blend-multiply"
+          />
         ) : (
           <span className="text-3xl opacity-20">📷</span>
         )}
