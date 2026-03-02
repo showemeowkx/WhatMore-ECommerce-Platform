@@ -309,7 +309,7 @@ const CartScreen: React.FC = () => {
         ? product.pricePromo
         : product.price;
 
-    return acc + price * Number(item.quantity);
+    return Math.round((acc + price * Number(item.quantity)) * 100) / 100;
   }, 0);
 
   const totalAmount = Number(rawTotalAmount.toFixed(2));
@@ -427,7 +427,7 @@ const CartScreen: React.FC = () => {
               className="bg-black hover:bg-gray-800 active:scale-95 transition-all text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-md shadow-gray-200 flex items-center gap-2"
             >
               <IonIcon icon={searchOutline} className="text-xl" />
-              Перейти до покупок
+              Перейти до магазину
             </button>
           </div>
         </IonContent>
@@ -565,9 +565,14 @@ const CartScreen: React.FC = () => {
                             name={product.name}
                             price={Number(
                               (
-                                (product.isPromo && product.pricePromo !== null
-                                  ? product.pricePromo
-                                  : product.price) * Number(item.quantity)
+                                Math.round(
+                                  (product.isPromo &&
+                                  product.pricePromo !== null
+                                    ? product.pricePromo
+                                    : product.price) *
+                                    Number(item.quantity) *
+                                    100,
+                                ) / 100
                               ).toFixed(2),
                             )}
                             unit={product.unitsOfMeasurments}

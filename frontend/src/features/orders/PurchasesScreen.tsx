@@ -152,7 +152,7 @@ const PurchasesScreen: React.FC = () => {
                 className="bg-black hover:bg-gray-800 active:scale-95 transition-all text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-md shadow-gray-200 flex items-center gap-2"
               >
                 <IonIcon icon={searchOutline} className="text-xl" />
-                Перейти до покупок
+                Перейти до магазину
               </button>
             </div>
           ) : (
