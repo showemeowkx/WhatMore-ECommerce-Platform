@@ -13,6 +13,7 @@ import {
   InternalServerErrorException,
   Get,
   Query,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,6 +29,7 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtPayload } from './jwt-payload.interface';
 import { RefreshPasswordDto } from './dto/refresh-password.dto';
 import { Throttle } from '@nestjs/throttler';
+import type { Response, Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -38,6 +40,15 @@ export class AuthController {
     private readonly cloudinaryService: CloudinaryService,
     private readonly configService: ConfigService,
   ) {}
+
+  private setRefreshTokenCookie(res: Response, token: string) {
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'prod',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -66,18 +77,22 @@ export class AuthController {
 
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('/signin')
-  signIn(
+  async signIn(
     @Body() signInDto: SignInDto,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
     this.logger.verbose(`Signing in... {login: ${signInDto.login}}`);
-    return this.authService.signIn(signInDto);
+    const tokens = await this.authService.signIn(signInDto);
+    this.setRefreshTokenCookie(res, tokens.refreshToken);
+    return { accessToken: tokens.accessToken };
   }
 
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
-  refreshTokens(
-    @Req() req: { user: JwtPayload & { refreshToken: string } },
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  async refreshTokens(
+    @Req() req: Request & { user: JwtPayload & { refreshToken: string } },
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
     const userId = req.user['sub'];
     const refreshToken = req.user['refreshToken'];
 
@@ -87,14 +102,20 @@ export class AuthController {
       throw new InternalServerErrorException('Refresh token is missing');
     }
 
-    return this.authService.refreshTokens(userId, refreshToken);
+    const tokens = await this.authService.refreshTokens(userId, refreshToken);
+    this.setRefreshTokenCookie(res, tokens.refreshToken);
+    return { accessToken: tokens.accessToken };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(@Req() req: { user: User }): Promise<void> {
+  async logout(
+    @Req() req: { user: User },
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
     this.logger.verbose(`Logging out... {login: ${req.user.phone}}`);
-    return this.authService.logout(req.user.id);
+    await this.authService.logout(req.user.id);
+    res.clearCookie('refreshToken');
   }
 
   @UseGuards(JwtAuthGuard)

@@ -5,6 +5,7 @@ const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const api = axios.create({
   baseURL,
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
@@ -54,9 +55,9 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const { refreshToken, user, setAuth, logout } = useAuthStore.getState();
+      const { user, setAuth, logout } = useAuthStore.getState();
 
-      if (!refreshToken || !user) {
+      if (!user) {
         logout();
         return Promise.reject(error);
       }
@@ -65,10 +66,10 @@ api.interceptors.response.use(
         const { data } = await axios.post(
           `${baseURL}/auth/refresh`,
           {},
-          { headers: { Authorization: `Bearer ${refreshToken}` } },
+          { withCredentials: true },
         );
 
-        setAuth(data.accessToken, data.refreshToken, user);
+        setAuth(data.accessToken, user);
 
         api.defaults.headers.common["Authorization"] =
           `Bearer ${data.accessToken}`;
@@ -77,7 +78,12 @@ api.interceptors.response.use(
         processQueue(null, data.accessToken);
         return api(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError instanceof Error ? refreshError : new Error(String(refreshError)), null);
+        processQueue(
+          refreshError instanceof Error
+            ? refreshError
+            : new Error(String(refreshError)),
+          null,
+        );
         logout();
         return Promise.reject(refreshError);
       } finally {
