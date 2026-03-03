@@ -575,7 +575,7 @@ const CartScreen: React.FC = () => {
                                 ) / 100
                               ).toFixed(2),
                             )}
-                            unit={product.unitsOfMeasurments}
+                            unit={`${item.quantity} ${product.unitsOfMeasurments}`}
                             image={product.imagePath}
                             isCartItem={true}
                             initialQuantity={Number(item.quantity)}
