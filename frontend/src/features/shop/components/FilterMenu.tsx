@@ -16,6 +16,7 @@ export interface FilterState {
   priceMax: number;
   showAll: boolean;
   showInactive: boolean;
+  code: string;
 }
 
 interface Category {
@@ -91,6 +92,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
       priceMax: MAX_PRICE_LIMIT,
       showAll: false,
       showInactive: false,
+      code: "",
     });
   };
 
@@ -125,6 +127,22 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
           <h3 className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
             Адмін-фільтри
           </h3>
+
+          <div className="flex flex-col mb-1">
+            <span className="text-sm font-bold text-gray-700 tracking-wide mb-2">
+              Пошук за кодом
+            </span>
+            <input
+              type="text"
+              value={localFilters.code}
+              onChange={(e) =>
+                setLocalFilters({ ...localFilters, code: e.target.value })
+              }
+              className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm font-bold text-gray-800 outline-none focus:border-black transition-colors"
+              placeholder="Введіть код товару"
+            />
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold text-gray-700 tracking-wide">
               Показувати без наявності

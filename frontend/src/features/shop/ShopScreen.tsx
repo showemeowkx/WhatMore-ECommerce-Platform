@@ -130,6 +130,7 @@ const ShopScreen: React.FC = () => {
     priceMax: MAX_PRICE_LIMIT,
     showAll: false,
     showInactive: false,
+    code: "",
   });
 
   const hasActiveFilters =
@@ -138,7 +139,8 @@ const ShopScreen: React.FC = () => {
     activeFilters.priceMin > 0 ||
     activeFilters.priceMax < MAX_PRICE_LIMIT ||
     activeFilters.showAll ||
-    activeFilters.showInactive;
+    activeFilters.showInactive ||
+    activeFilters.code !== "";
 
   const isAdminRoute = location.pathname.startsWith("/admin");
   const basePath = isAdminRoute ? "/admin" : "/app";
@@ -227,6 +229,10 @@ const ShopScreen: React.FC = () => {
             "categoryIds",
             activeFilters.categories.join(","),
           );
+        }
+
+        if (activeFilters.code) {
+          filterParams.append("code", activeFilters.code);
         }
 
         const showAllParam = user?.isAdmin && activeFilters.showAll ? "1" : "0";
@@ -413,6 +419,7 @@ const ShopScreen: React.FC = () => {
       priceMax: MAX_PRICE_LIMIT,
       showAll: false,
       showInactive: false,
+      code: "",
     });
   };
 
@@ -963,6 +970,7 @@ const ShopScreen: React.FC = () => {
                     priceMax: MAX_PRICE_LIMIT,
                     showAll: false,
                     showInactive: false,
+                    code: "",
                   });
                 }, 400);
               }}
