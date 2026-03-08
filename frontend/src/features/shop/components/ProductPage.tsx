@@ -42,6 +42,7 @@ interface Stock {
 interface Product {
   id: number;
   ukrskladId: number;
+  code?: string;
   name: string;
   lastSyncedName?: string;
   description?: string;
@@ -471,6 +472,12 @@ const ProductScreen: React.FC = () => {
                     Категорія неактивна
                   </span>
                 )}
+
+                {user?.isAdmin && isPlatform("desktop") && product.code && (
+                  <span className="ml-1 text-xs bg-gray-800 text-white px-2.5 py-1 rounded-lg font-mono font-bold shadow-sm">
+                    {`Код: ${product.code}`}
+                  </span>
+                )}
               </div>
 
               <div className="prose prose-sm text-gray-500 mb-8 leading-relaxed">
@@ -552,6 +559,12 @@ const ProductScreen: React.FC = () => {
                   </span>
                 </>
               )}
+
+              {user?.isAdmin && isPlatform("desktop") && product.code && (
+                <span className="text-[10px] bg-gray-800 text-white px-2 py-0.5 rounded-md font-mono font-bold shadow-sm">
+                  {product.code ? `Код: ${product.code}` : ""}
+                </span>
+              )}
             </div>
 
             <h3 className="font-bold text-lg text-gray-800 mb-2 mt-4">
@@ -622,6 +635,8 @@ const ProductScreen: React.FC = () => {
                         isActive={alikeProduct.isActive}
                         isOutOfStock={currentStockAlike <= 0}
                         isCategoryActive={isCatActiveAlike}
+                        code={alikeProduct.code || ""}
+                        isAdmin={user?.isAdmin}
                         onClick={() =>
                           history.push(`${basePath}/product/${alikeProduct.id}`)
                         }

@@ -11,6 +11,8 @@ interface ProductCardProps {
   isActive?: boolean;
   isOutOfStock?: boolean;
   isCategoryActive?: boolean;
+  code?: string | number;
+  isAdmin?: boolean;
   onClick?: () => void;
   onAddToCart?: () => void;
 }
@@ -24,6 +26,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isActive,
   isOutOfStock,
   isCategoryActive,
+  code,
+  isAdmin,
   onClick,
   onAddToCart,
 }) => {
@@ -55,6 +59,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {discountPercentage > 0 && !isUnavailable && (
           <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-sm z-10">
             -{discountPercentage}%
+          </div>
+        )}
+
+        {isAdmin && isPlatform("desktop") && code && (
+          <div className="absolute top-2 right-2 bg-gray-800 text-white text-[10px] font-mono font-bold px-2 py-1 rounded-lg shadow-sm z-10">
+            {code}
           </div>
         )}
 

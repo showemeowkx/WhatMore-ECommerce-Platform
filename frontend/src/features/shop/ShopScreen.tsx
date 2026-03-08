@@ -52,6 +52,7 @@ const MAX_PRICE_LIMIT = Number(import.meta.env.VITE_MAX_PRICE_LIMIT) || 2500;
 interface Product {
   id: number;
   ukrskladId: number;
+  code?: string;
   name: string;
   description?: string;
   categoryId: number;
@@ -799,6 +800,8 @@ const ShopScreen: React.FC = () => {
                               ?.isActive
                           : true
                       }
+                      code={product.code}
+                      isAdmin={user?.isAdmin}
                       onClick={() =>
                         history.push(`${basePath}/product/${product.id}`)
                       }
@@ -889,6 +892,8 @@ const ShopScreen: React.FC = () => {
                                   )?.isActive
                                 : true
                             }
+                            code={product.code}
+                            isAdmin={user?.isAdmin}
                             onClick={() =>
                               history.push(`${basePath}/product/${product.id}`)
                             }
