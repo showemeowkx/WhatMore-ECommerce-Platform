@@ -23,6 +23,7 @@ import type { Cache } from 'cache-manager';
 import { AutoClearCache } from 'src/common/decorators/auto-clear-cache.decorator';
 import { CartItem } from 'src/cart/entities/cart-item.entity';
 import { SmsService } from 'src/notifications/sms.service';
+import { DeliverySpecificationsDto } from './dto/order-delivery-specs.dto';
 
 @Injectable()
 export class OrdersService {
@@ -44,7 +45,10 @@ export class OrdersService {
   ) {}
 
   @AutoClearCache('/orders')
-  async create(user: User): Promise<void> {
+  async create(
+    user: User,
+    deliverySpecs: DeliverySpecificationsDto,
+  ): Promise<void> {
     const cart = await this.cartService.getCartByUserId(user.id);
 
     if (!cart.items || cart.items.length === 0) {
@@ -133,6 +137,10 @@ export class OrdersService {
         items: orderItems,
         storeId: user.selectedStoreId,
         store: user.selectedStore,
+        deliveryAddress: deliverySpecs.deliveryAddress,
+        apartment: deliverySpecs.apartment,
+        paymentMethod: deliverySpecs.paymentMethod,
+        comment: deliverySpecs.comment,
         createdAt: new Date(),
       });
 
@@ -281,11 +289,11 @@ export class OrdersService {
       if (this.configService.get<string>('NODE_ENV') === 'prod') {
         await this.smsService.sendSms(
           order.user.phone,
-          `Замовлення номер ${order.orderNumber} готове до отримання у магазині "Що? Ще?" за адресою: ${order.store.address}.`,
+          `Замовлення номер ${order.orderNumber} у процесі доставки. Кур'єр зв'яжеться з вами найближчим часом!`,
         );
       } else {
         this.logger.debug(
-          `[MOCK SMS] To: ${order.user.phone} | Message: Замовлення номер ${order.orderNumber} готове до отримання у магазині "Що? Ще?" за адресою: ${order.store.address}.`,
+          `[MOCK SMS] To: ${order.user.phone} | Message: Замовлення номер ${order.orderNumber} у процесі доставки. Кур'єр зв'яжеться з вами найближчим часом!`,
         );
       }
     }

@@ -19,6 +19,7 @@ import { Order, OrderStatus } from './entities/order.entity';
 import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { GetOrdersDto } from './dto/get-orders.dto';
 import { CacheTTL } from '@nestjs/cache-manager';
+import { DeliverySpecificationsDto } from './dto/order-delivery-specs.dto';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -27,9 +28,12 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Req() req: { user: User }): Promise<void> {
+  create(
+    @Req() req: { user: User },
+    @Body() deliverySpecs: DeliverySpecificationsDto,
+  ): Promise<void> {
     this.logger.verbose(`Placing an order... {userId: ${req.user.id}}`);
-    return this.ordersService.create(req.user);
+    return this.ordersService.create(req.user, deliverySpecs);
   }
 
   @Get('/all')
