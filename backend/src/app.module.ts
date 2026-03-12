@@ -14,6 +14,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { DeliveryModule } from './delivery/delivery.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { APP_GUARD } from '@nestjs/core';
     StoreModule,
     OrdersModule,
     SyncModule,
+    DeliveryModule,
   ],
   providers: [
     {
