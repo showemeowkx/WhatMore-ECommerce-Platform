@@ -6,13 +6,11 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { Store } from 'src/store/entities/store.entity';
-import { Payment } from 'src/payments/entites/payment.entity';
 
 export enum OrderStatus {
   CANCELLED = 'CANCELLED',
@@ -44,13 +42,6 @@ export class Order {
   @ManyToOne(() => Store, (store) => store.orders, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'storeId' })
   store: Store;
-
-  @Column({ nullable: true })
-  paymentId: string;
-
-  @OneToOne(() => Payment, (payment) => payment.order, { cascade: true })
-  @JoinColumn({ name: 'paymentId' })
-  payment: Payment;
 
   @Column('enum', { enum: OrderStatus })
   status: OrderStatus;

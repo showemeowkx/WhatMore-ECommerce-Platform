@@ -1,7 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Cart } from 'src/cart/entities/cart.entity';
 import { Order } from 'src/orders/entities/order.entity';
-import { Wallet } from 'src/payments/entites/wallet.entity';
 import { Store } from 'src/store/entities/store.entity';
 import {
   Column,
@@ -48,9 +47,6 @@ export class User {
 
   @Column({ nullable: true })
   selectedStoreId: number;
-
-  @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
-  wallet: Wallet;
 
   @Column({ default: false })
   isAdmin: boolean;
