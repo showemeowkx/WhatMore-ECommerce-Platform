@@ -43,6 +43,18 @@ export class Order {
   @JoinColumn({ name: 'storeId' })
   store: Store;
 
+  @Column({ nullable: true })
+  deliveryAddress: string;
+
+  @Column({ nullable: true })
+  apartment: string;
+
+  @Column({ type: 'enum', enum: ['CASH', 'CARD_TERMINAL'] })
+  paymentMethod: string;
+
+  @Column({ nullable: true })
+  comment: string;
+
   @Column('enum', { enum: OrderStatus })
   status: OrderStatus;
 

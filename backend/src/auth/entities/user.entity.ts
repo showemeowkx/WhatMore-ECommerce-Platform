@@ -48,6 +48,12 @@ export class User {
   @Column({ nullable: true })
   selectedStoreId: number;
 
+  @Column({ nullable: true })
+  deliveryAddress: string;
+
+  @Column({ nullable: true })
+  apartment: string;
+
   @Column({ default: false })
   isAdmin: boolean;
 
