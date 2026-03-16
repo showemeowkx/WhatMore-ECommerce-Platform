@@ -39,7 +39,6 @@ import { useCartStore } from "../cart/cart.store";
 import ProfileScreen from "../profile/ProfileScreen";
 import ProfileEditScreen from "../profile/ProfileEditScreen";
 import ProfileSecurityScreen from "../profile/ProfileSecurityScreen";
-import ProfileWalletScreen from "../profile/ProfileWalletScreen";
 import ProfileSupportScreen from "../profile/ProfileSupportScreen";
 import SyncScreen from "../sync/SyncScreen";
 import PurchasesScreen from "../orders/PurchasesScreen";
@@ -294,11 +293,6 @@ const ShopLayout: React.FC = () => {
             exact
             path={`${basePath}/profile/edit`}
             component={ProfileEditScreen}
-          />
-          <Route
-            exact
-            path={`${basePath}/profile/wallet`}
-            component={ProfileWalletScreen}
           />
           <Route
             exact
