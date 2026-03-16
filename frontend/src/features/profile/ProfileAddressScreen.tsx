@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   IonPage,
   IonHeader,
@@ -6,7 +5,6 @@ import {
   IonButton,
   IonIcon,
   IonContent,
-  IonSpinner,
 } from "@ionic/react";
 import {
   chevronBackOutline,
@@ -15,34 +13,12 @@ import {
   pencilOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
-
-interface UserProfile {
-  deliveryAddress: string | null;
-  apartment: string | null;
-}
+import { useAuthStore } from "../auth/auth.store";
 
 const ProfileAddressScreen: React.FC = () => {
   const history = useHistory();
 
-  // MOCK DATA
-  const [profile, setProfile] = useState<UserProfile | null>({
-    deliveryAddress: "м. Фастів, вул. Соборна, 42",
-    apartment: null,
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  if (isLoading) {
-    return (
-      <IonPage>
-        <IonContent className="bg-gray-50 text-gray-900">
-          <div className="flex h-full items-center justify-center">
-            <IonSpinner name="crescent" color="medium" />
-          </div>
-        </IonContent>
-      </IonPage>
-    );
-  }
+  const { user } = useAuthStore();
 
   return (
     <IonPage>
@@ -86,7 +62,7 @@ const ProfileAddressScreen: React.FC = () => {
               Сюди ми будемо доставляти Ваші замовлення за замовчуванням.
             </p>
 
-            {profile?.deliveryAddress ? (
+            {user?.deliveryAddress ? (
               <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-5 md:p-6 mb-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 border border-purple-100 shrink-0 mt-1">
@@ -97,11 +73,11 @@ const ProfileAddressScreen: React.FC = () => {
                       Поточна адреса
                     </span>
                     <span className="font-bold text-gray-800 text-[17px] leading-tight mb-1.5">
-                      {profile.deliveryAddress}
+                      {user.deliveryAddress}
                     </span>
-                    {profile.apartment && (
+                    {user.apartment && (
                       <span className="text-[15px] font-medium text-gray-500">
-                        Квартира: {profile.apartment}
+                        Квартира: {user.apartment}
                       </span>
                     )}
                   </div>
@@ -129,10 +105,10 @@ const ProfileAddressScreen: React.FC = () => {
               className="w-full py-4 mt-4 bg-black text-white rounded-2xl font-bold text-base hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200 transition-all flex justify-center items-center gap-2 outline-none select-none"
             >
               <IonIcon
-                icon={profile?.deliveryAddress ? pencilOutline : addOutline}
+                icon={user?.deliveryAddress ? pencilOutline : addOutline}
                 className="text-xl"
               />
-              {profile?.deliveryAddress ? "Змінити адресу" : "Додати адресу"}
+              {user?.deliveryAddress ? "Змінити адресу" : "Додати адресу"}
             </button>
           </div>
         </div>
