@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   IonPage,
   IonHeader,
@@ -14,11 +15,12 @@ import {
 } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { useAuthStore } from "../auth/auth.store";
+import AddressModal from "./components/AddressModal";
 
 const ProfileAddressScreen: React.FC = () => {
   const history = useHistory();
-
   const { user } = useAuthStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <IonPage>
@@ -101,7 +103,9 @@ const ProfileAddressScreen: React.FC = () => {
             )}
 
             <button
-              onClick={() => {}}
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
               className="w-full py-4 mt-4 bg-black text-white rounded-2xl font-bold text-base hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200 transition-all flex justify-center items-center gap-2 outline-none select-none"
             >
               <IonIcon
@@ -113,6 +117,11 @@ const ProfileAddressScreen: React.FC = () => {
           </div>
         </div>
       </IonContent>
+
+      <AddressModal
+        isOpen={isModalOpen}
+        onDidDismiss={() => setIsModalOpen(false)}
+      />
     </IonPage>
   );
 };
