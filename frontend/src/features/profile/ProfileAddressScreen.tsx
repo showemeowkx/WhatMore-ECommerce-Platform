@@ -65,7 +65,7 @@ const ProfileAddressScreen: React.FC = () => {
             {user?.deliveryAddress ? (
               <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-5 md:p-6 mb-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 border border-purple-100 shrink-0 mt-1">
+                  <div className="w-12 h-12 rounded-full bg-green-100 border-green-300 border-[1px] flex items-center justify-center text-green-500 border border-green-100 shrink-0 mt-1">
                     <IonIcon icon={locationOutline} className="text-xl" />
                   </div>
                   <div className="flex flex-col flex-1">
