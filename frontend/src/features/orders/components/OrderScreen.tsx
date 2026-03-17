@@ -392,8 +392,7 @@ const OrderScreen: React.FC = () => {
                       <IonIcon icon={walletOutline} /> Спосіб оплати
                     </span>
                     <span className="text-sm font-bold text-gray-800 text-right">
-                      {order.paymentMethod === "CARD" ||
-                      order.paymentMethod === "CARD_TERMINAL"
+                      {order.paymentMethod === "CARD_TERMINAL"
                         ? "Карткою"
                         : order.paymentMethod === "CASH"
                           ? "Готівкою"
