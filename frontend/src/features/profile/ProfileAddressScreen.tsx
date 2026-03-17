@@ -76,6 +76,7 @@ const ProfileAddressScreen: React.FC = () => {
                     </span>
                     <span className="font-bold text-gray-800 text-[17px] leading-tight mb-1.5">
                       {user.deliveryAddress}
+                      {user.streetNumber ? `, буд. ${user.streetNumber}` : ""}
                     </span>
                     {user.apartment && (
                       <span className="text-[15px] font-medium text-gray-500">
