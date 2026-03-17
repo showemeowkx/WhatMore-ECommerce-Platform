@@ -19,8 +19,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
     switch (currentStatus.toUpperCase()) {
       case "COMPLETED":
         return "Виконано";
-      case "READY":
-        return "Готово до отримання";
+      case "IN DELIVERY":
+        return "Доставляється";
       case "IN PROCESS":
         return "У процесі обробки";
       case "CANCELLED":

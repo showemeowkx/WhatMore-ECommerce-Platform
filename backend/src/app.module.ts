@@ -12,9 +12,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { configValidationSchema } from './config.schema';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
-import { PaymentsModule } from './payments/payments.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { DeliveryModule } from './delivery/delivery.module';
 
 @Module({
   imports: [
@@ -59,7 +59,7 @@ import { APP_GUARD } from '@nestjs/core';
     StoreModule,
     OrdersModule,
     SyncModule,
-    PaymentsModule,
+    DeliveryModule,
   ],
   providers: [
     {

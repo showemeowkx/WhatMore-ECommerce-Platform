@@ -580,6 +580,7 @@ const ShopScreen: React.FC = () => {
                   fill="clear"
                   onClick={() => history.push(`${basePath}/profile`)}
                   className="m-0 h-8"
+                  color="dark"
                 >
                   <IonIcon
                     icon={personCircleOutline}

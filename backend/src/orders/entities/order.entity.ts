@@ -6,18 +6,16 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { Store } from 'src/store/entities/store.entity';
-import { Payment } from 'src/payments/entites/payment.entity';
 
 export enum OrderStatus {
   CANCELLED = 'CANCELLED',
   IN_PROCESS = 'IN PROCESS',
-  READY = 'READY',
+  IN_DELIVERY = 'IN DELIVERY',
   COMPLETED = 'COMPLETED',
 }
 
@@ -46,11 +44,19 @@ export class Order {
   store: Store;
 
   @Column({ nullable: true })
-  paymentId: string;
+  deliveryAddress: string;
 
-  @OneToOne(() => Payment, (payment) => payment.order, { cascade: true })
-  @JoinColumn({ name: 'paymentId' })
-  payment: Payment;
+  @Column({ nullable: true })
+  streetNumber: string;
+
+  @Column({ nullable: true })
+  apartment: string;
+
+  @Column({ type: 'enum', enum: ['CASH', 'CARD_TERMINAL'] })
+  paymentMethod: string;
+
+  @Column({ nullable: true })
+  comment: string;
 
   @Column('enum', { enum: OrderStatus })
   status: OrderStatus;

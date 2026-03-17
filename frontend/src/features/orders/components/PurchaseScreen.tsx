@@ -48,6 +48,9 @@ interface Order {
   createdAt: string;
   updatedAt?: string;
   store?: Store;
+  deliveryAddress?: string;
+  streetNumber?: string;
+  apartment?: string;
   items: OrderItem[];
 }
 
@@ -82,9 +85,9 @@ const PurchaseScreen: React.FC = () => {
     switch (currentStatus.toUpperCase()) {
       case "COMPLETED":
         return "text-green-600 bg-green-50 border-green-100";
-      case "READY":
-        return "text-yellow-600 bg-yellow-100 border-yellow-200";
       case "IN PROCESS":
+        return "text-yellow-600 bg-yellow-100 border-yellow-200";
+      case "IN DELIVERY":
         return "text-blue-600 bg-blue-50 border-blue-100";
       case "CANCELLED":
         return "text-red-600 bg-red-50 border-red-100";
@@ -97,8 +100,8 @@ const PurchaseScreen: React.FC = () => {
     switch (currentStatus.toUpperCase()) {
       case "COMPLETED":
         return "Виконано";
-      case "READY":
-        return "Готово до отримання";
+      case "IN DELIVERY":
+        return "Доставляється";
       case "IN PROCESS":
         return "У процесі обробки";
       case "CANCELLED":
@@ -225,10 +228,25 @@ const PurchaseScreen: React.FC = () => {
                     {translateStatus(order.status)}
                   </span>
 
-                  <div className="flex flex-col mt-2">
+                  <div className="flex flex-col mt-2 gap-1.5">
                     {order.store?.address && (
-                      <span className="text-sm font-bold text-gray-800">
+                      <span className="text-sm font-medium text-gray-500">
+                        <span className="font-bold text-gray-700">
+                          Магазин:{" "}
+                        </span>
                         {order.store.address}
+                      </span>
+                    )}
+                    {order.deliveryAddress && (
+                      <span className="text-sm font-medium text-gray-500 leading-snug">
+                        <span className="font-bold text-gray-700">
+                          Адреса доставки:{" "}
+                        </span>
+                        {order.deliveryAddress}
+                        {order.streetNumber
+                          ? `, буд. ${order.streetNumber}`
+                          : ""}
+                        {order.apartment ? `, кв. ${order.apartment}` : ""}
                       </span>
                     )}
                     <span className="text-sm font-medium text-gray-500 mt-0.5">

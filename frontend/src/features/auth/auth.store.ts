@@ -10,6 +10,9 @@ export interface User {
   imagePath?: string;
   isAdmin?: boolean;
   selectedStoreId?: number | null;
+  deliveryAddress?: string | null;
+  streetNumber?: string | null;
+  apartment?: string | null;
 }
 
 interface AuthState {

@@ -21,9 +21,9 @@ import { GetOrdersDto } from './dto/get-orders.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { AutoClearCache } from 'src/common/decorators/auto-clear-cache.decorator';
-import { PaymentsService } from 'src/payments/payments.service';
 import { CartItem } from 'src/cart/entities/cart-item.entity';
 import { SmsService } from 'src/notifications/sms.service';
+import { DeliverySpecificationsDto } from './dto/order-delivery-specs.dto';
 
 @Injectable()
 export class OrdersService {
@@ -40,13 +40,15 @@ export class OrdersService {
     private readonly dataSource: DataSource,
     private readonly configService: ConfigService,
     private readonly syncService: SyncService,
-    private readonly paymentsService: PaymentsService,
     private readonly smsService: SmsService,
     @Inject(CACHE_MANAGER) public cacheManager: Cache,
   ) {}
 
   @AutoClearCache('/orders')
-  async create(user: User): Promise<void> {
+  async create(
+    user: User,
+    deliverySpecs: DeliverySpecificationsDto,
+  ): Promise<void> {
     const cart = await this.cartService.getCartByUserId(user.id);
 
     if (!cart.items || cart.items.length === 0) {
@@ -128,13 +130,6 @@ export class OrdersService {
         await qr.manager.save(stocks);
       }
 
-      const paymentEntity = await this.paymentsService.chargeWallet(
-        user,
-        totalAmount,
-      );
-
-      const savedPayment = await qr.manager.save(paymentEntity);
-
       const newOrder = qr.manager.create(Order, {
         user,
         totalAmount,
@@ -142,8 +137,11 @@ export class OrdersService {
         items: orderItems,
         storeId: user.selectedStoreId,
         store: user.selectedStore,
-        paymentId: savedPayment.id,
-        payment: savedPayment,
+        deliveryAddress: deliverySpecs.deliveryAddress,
+        streetNumber: deliverySpecs.streetNumber,
+        apartment: deliverySpecs.apartment,
+        paymentMethod: deliverySpecs.paymentMethod,
+        comment: deliverySpecs.comment,
         createdAt: new Date(),
       });
 
@@ -278,7 +276,7 @@ export class OrdersService {
   async updateStatus(id: number, status: OrderStatus): Promise<Order> {
     const order = await this.findOne(id);
 
-    if (status === OrderStatus.READY) {
+    if (status === OrderStatus.IN_DELIVERY) {
       const productsToUpdate = this.getProductsToUpdate(order);
       const prevSyncState = this.syncService.getSyncStatus().running;
 
@@ -292,11 +290,11 @@ export class OrdersService {
       if (this.configService.get<string>('NODE_ENV') === 'prod') {
         await this.smsService.sendSms(
           order.user.phone,
-          `Замовлення номер ${order.orderNumber} готове до отримання у магазині "Що? Ще?" за адресою: ${order.store.address}.`,
+          `Замовлення номер ${order.orderNumber} у процесі доставки. Кур'єр зв'яжеться з вами найближчим часом!`,
         );
       } else {
         this.logger.debug(
-          `[MOCK SMS] To: ${order.user.phone} | Message: Замовлення номер ${order.orderNumber} готове до отримання у магазині "Що? Ще?" за адресою: ${order.store.address}.`,
+          `[MOCK SMS] To: ${order.user.phone} | Message: Замовлення номер ${order.orderNumber} у процесі доставки. Кур'єр зв'яжеться з вами найближчим часом!`,
         );
       }
     }

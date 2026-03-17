@@ -12,13 +12,13 @@ import {
 import {
   chevronBackOutline,
   personOutline,
-  walletOutline,
   lockClosedOutline,
   chatbubblesOutline,
   documentTextOutline,
   logOutOutline,
   chevronForwardOutline,
   alertCircleOutline,
+  locationOutline,
 } from "ionicons/icons";
 import { useHistory, useLocation } from "react-router-dom";
 import api from "../../config/api";
@@ -95,9 +95,9 @@ const ProfileScreen: React.FC = () => {
       path: `${basePath}/profile/edit`,
     },
     {
-      title: "Гаманець",
-      icon: walletOutline,
-      path: `${basePath}/profile/wallet`,
+      title: "Моя адреса",
+      icon: locationOutline,
+      path: `${basePath}/profile/address`,
     },
     {
       title: "Безпека",
