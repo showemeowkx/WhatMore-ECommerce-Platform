@@ -6,6 +6,7 @@ import {
   IonButton,
   IonIcon,
   IonContent,
+  useIonToast,
 } from "@ionic/react";
 import {
   chevronBackOutline,
@@ -16,11 +17,48 @@ import {
 import { useHistory } from "react-router-dom";
 import { useAuthStore } from "../auth/auth.store";
 import AddressModal from "./components/AddressModal";
+import api from "../../config/api";
 
 const ProfileAddressScreen: React.FC = () => {
   const history = useHistory();
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [presentToast] = useIonToast();
+
+  const handleSaveAddress = async (data: {
+    street: string;
+    streetNumber: string;
+    apartment: string;
+  }) => {
+    try {
+      await api.patch("/auth", {
+        deliveryAddress: data.street,
+        streetNumber: data.streetNumber,
+        apartment: data.apartment,
+      });
+
+      updateUser({
+        deliveryAddress: data.street,
+        streetNumber: data.streetNumber,
+        apartment: data.apartment,
+      });
+
+      presentToast({
+        message: "Адресу успішно збережено",
+        duration: 1500,
+        color: "success",
+      });
+    } catch (error) {
+      console.error("Не вдалося зберегти адресу:", error);
+
+      presentToast({
+        message: "Помилка при збереженні адреси",
+        duration: 2000,
+        color: "danger",
+      });
+    }
+  };
 
   return (
     <IonPage>
@@ -122,6 +160,7 @@ const ProfileAddressScreen: React.FC = () => {
       <AddressModal
         isOpen={isModalOpen}
         onDidDismiss={() => setIsModalOpen(false)}
+        onSave={handleSaveAddress}
       />
     </IonPage>
   );

@@ -16,11 +16,17 @@ import api from "../../../config/api";
 interface AddressModalProps {
   isOpen: boolean;
   onDidDismiss: () => void;
+  onSave: (data: {
+    street: string;
+    streetNumber: string;
+    apartment: string;
+  }) => void;
 }
 
 const AddressModal: React.FC<AddressModalProps> = ({
   isOpen,
   onDidDismiss,
+  onSave,
 }) => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
@@ -239,7 +245,10 @@ const AddressModal: React.FC<AddressModalProps> = ({
             <IonButton
               expand="block"
               disabled={!isStreetSelected || !streetNumber.trim()}
-              onClick={() => {}}
+              onClick={() => {
+                onSave({ street, streetNumber, apartment });
+                onDidDismiss();
+              }}
               className={`h-14 mt-4 font-black text-lg ${
                 !isStreetSelected || !streetNumber.trim() ? "opacity-50" : ""
               }`}
