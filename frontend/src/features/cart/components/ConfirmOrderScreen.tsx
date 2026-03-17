@@ -8,6 +8,8 @@ import {
   IonContent,
   IonFooter,
   isPlatform,
+  useIonToast,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   chevronBackOutline,
@@ -16,15 +18,21 @@ import {
   chatbubbleOutline,
   chevronDownOutline,
   checkmarkOutline,
+  checkmarkCircleOutline,
 } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../auth/auth.store";
+import { useCartStore } from "../cart.store";
+import api from "../../../config/api";
 
 const ConfirmOrderScreen: React.FC = () => {
   const history = useHistory();
+  const location = useLocation();
   const { user } = useAuthStore();
+  const { fetchCart } = useCartStore();
 
   const isDesktop = isPlatform("desktop");
+  const basePath = location.pathname.startsWith("/admin") ? "/admin" : "/app";
 
   const hasDefaultAddress = !!user?.deliveryAddress;
   const [useDefaultAddress, setUseDefaultAddress] = useState(hasDefaultAddress);
@@ -34,6 +42,20 @@ const ConfirmOrderScreen: React.FC = () => {
 
   const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState(false);
   const paymentRef = useRef<HTMLDivElement>(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [presentToast] = useIonToast();
+
+  useIonViewWillEnter(() => {
+    setIsSuccess(false);
+  });
+
+  useEffect(() => {
+    if (!user?.deliveryAddress) {
+      setUseDefaultAddress(false);
+    }
+  }, [user?.deliveryAddress]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,9 +70,78 @@ const ConfirmOrderScreen: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleSubmitOrder = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        deliveryAddress: user?.deliveryAddress,
+        streetNumber: user?.streetNumber || "",
+        paymentMethod: paymentMethod.toUpperCase() as "CASH" | "CARD_TERMINAL",
+        comment: comment.trim() || undefined,
+      };
+
+      await api.post("/orders/", payload);
+
+      if (fetchCart) await fetchCart();
+
+      setIsSuccess(true);
+    } catch (error) {
+      console.error("Помилка при оформленні замовлення:", error);
+      presentToast({
+        message: "Не вдалося оформити замовлення. Спробуйте ще раз.",
+        duration: 3000,
+        color: "danger",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const formattedAddress = user?.deliveryAddress
     ? `м. Фастів, вул. ${user.deliveryAddress}${user.streetNumber ? `, буд. ${user.streetNumber}` : ""}${user.apartment ? `, кв. ${user.apartment}` : ""}`
     : "Адресу не встановлено";
+
+  if (isSuccess) {
+    return (
+      <IonPage>
+        <IonContent className="bg-gray-50 text-gray-900" fullscreen>
+          <div className="flex flex-col items-center justify-center h-full px-6 text-center animate-fade-in gap-4">
+            <div className="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mb-4">
+              <IonIcon icon={checkmarkCircleOutline} className="text-6xl" />
+            </div>
+            <h2 className="text-3xl font-black text-gray-800">
+              Замовлення оформлено!
+            </h2>
+
+            <p className="text-gray-500 leading-relaxed max-w-sm text-base mt-2">
+              Ваше замовлення успішно прийнято в обробку. Найближчим часом Ви
+              отримаєте SMS-сповіщення з деталями.
+            </p>
+
+            <p className="text-gray-500 text-base">
+              Ви можете відстежувати статус на сторінці
+            </p>
+
+            <button
+              onClick={() => history.push(`${basePath}/purchases`)}
+              className="text-black font-bold text-lg bg-white underline active:scale-95 transition-transform"
+            >
+              Мої покупки
+            </button>
+
+            <button
+              onClick={() => history.push(`${basePath}/shop`)}
+              className="mt-8 px-8 py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-all shadow-md w-full max-w-sm text-lg"
+            >
+              Повернутися до магазину
+            </button>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
 
   return (
     <IonPage>
@@ -208,7 +299,7 @@ const ConfirmOrderScreen: React.FC = () => {
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50 animate-fade-in-down">
                     {[
                       { value: "cash", label: "Готівкою" },
-                      { value: "card", label: "Карткою" },
+                      { value: "card_terminal", label: "Карткою" },
                     ].map((option) => (
                       <button
                         key={option.value}
@@ -266,15 +357,15 @@ const ConfirmOrderScreen: React.FC = () => {
             {isDesktop && (
               <div className="pt-2 pb-8">
                 <button
-                  disabled={!hasDefaultAddress}
-                  onClick={() => {}}
+                  disabled={!hasDefaultAddress || isSubmitting}
+                  onClick={handleSubmitOrder}
                   className={`w-full py-4 rounded-2xl font-bold text-lg transition-all outline-none select-none ${
-                    !hasDefaultAddress
+                    !hasDefaultAddress || isSubmitting
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-black text-white hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200"
                   }`}
                 >
-                  Підтвердити замовлення
+                  {isSubmitting ? "Обробка..." : "Підтвердити замовлення"}
                 </button>
               </div>
             )}
@@ -286,15 +377,15 @@ const ConfirmOrderScreen: React.FC = () => {
         <IonFooter className="ion-no-border bg-white md:hidden shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-safe">
           <div className="px-4 py-3">
             <button
-              disabled={!hasDefaultAddress}
-              onClick={() => {}}
+              disabled={!hasDefaultAddress || isSubmitting}
+              onClick={handleSubmitOrder}
               className={`w-full py-4 rounded-2xl font-bold text-lg transition-all outline-none select-none ${
-                !hasDefaultAddress
+                !hasDefaultAddress || isSubmitting
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-black text-white hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200"
               }`}
             >
-              Підтвердити замовлення
+              {isSubmitting ? "Обробка..." : "Підтвердити замовлення"}
             </button>
           </div>
         </IonFooter>
