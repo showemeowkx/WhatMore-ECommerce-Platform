@@ -48,6 +48,9 @@ interface Order {
   createdAt: string;
   updatedAt?: string;
   store?: Store;
+  deliveryAddress?: string;
+  streetNumber?: string;
+  apartment?: string;
   items: OrderItem[];
 }
 
@@ -225,10 +228,25 @@ const PurchaseScreen: React.FC = () => {
                     {translateStatus(order.status)}
                   </span>
 
-                  <div className="flex flex-col mt-2">
+                  <div className="flex flex-col mt-2 gap-1.5">
                     {order.store?.address && (
-                      <span className="text-sm font-bold text-gray-800">
+                      <span className="text-sm font-medium text-gray-500">
+                        <span className="font-bold text-gray-700">
+                          Магазин:{" "}
+                        </span>
                         {order.store.address}
+                      </span>
+                    )}
+                    {order.deliveryAddress && (
+                      <span className="text-sm font-medium text-gray-500 leading-snug">
+                        <span className="font-bold text-gray-700">
+                          Адреса доставки:{" "}
+                        </span>
+                        {order.deliveryAddress}
+                        {order.streetNumber
+                          ? `, буд. ${order.streetNumber}`
+                          : ""}
+                        {order.apartment ? `, кв. ${order.apartment}` : ""}
                       </span>
                     )}
                     <span className="text-sm font-medium text-gray-500 mt-0.5">
