@@ -85,9 +85,9 @@ const PurchaseScreen: React.FC = () => {
     switch (currentStatus.toUpperCase()) {
       case "COMPLETED":
         return "text-green-600 bg-green-50 border-green-100";
-      case "READY":
-        return "text-yellow-600 bg-yellow-100 border-yellow-200";
       case "IN PROCESS":
+        return "text-yellow-600 bg-yellow-100 border-yellow-200";
+      case "IN DELIVERY":
         return "text-blue-600 bg-blue-50 border-blue-100";
       case "CANCELLED":
         return "text-red-600 bg-red-50 border-red-100";
@@ -100,8 +100,8 @@ const PurchaseScreen: React.FC = () => {
     switch (currentStatus.toUpperCase()) {
       case "COMPLETED":
         return "Виконано";
-      case "READY":
-        return "Готово до отримання";
+      case "IN DELIVERY":
+        return "Доставляється";
       case "IN PROCESS":
         return "У процесі обробки";
       case "CANCELLED":

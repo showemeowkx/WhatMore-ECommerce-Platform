@@ -187,7 +187,7 @@ const OrderScreen: React.FC = () => {
     switch (currentStatus.toUpperCase()) {
       case "COMPLETED":
         return "text-green-600 bg-green-50 border-green-100";
-      case "READY":
+      case "IN PROCESS":
         return "text-yellow-600 bg-yellow-100 border-yellow-200";
       case "IN DELIVERY":
         return "text-blue-600 bg-blue-50 border-blue-100";
