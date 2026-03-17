@@ -763,7 +763,7 @@ const CartScreen: React.FC = () => {
 
                 <button
                   disabled={isSubmitDisabled || isSubmitting}
-                  onClick={handleSubmitOrder}
+                  onClick={() => history.push(`${basePath}/cart/confirm`)}
                   className={`w-full font-bold text-base py-4 rounded-2xl flex items-center justify-center gap-2 transition-all ${
                     isSubmitDisabled || isSubmitting
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
@@ -806,7 +806,7 @@ const CartScreen: React.FC = () => {
 
             <button
               disabled={isSubmitDisabled || isSubmitting}
-              onClick={handleSubmitOrder}
+              onClick={() => history.push(`${basePath}/cart/confirm`)}
               className={`px-8 py-3.5 rounded-2xl font-bold flex items-center gap-2 transition-all ${
                 isSubmitDisabled || isSubmitting
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"

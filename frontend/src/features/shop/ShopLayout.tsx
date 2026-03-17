@@ -48,6 +48,7 @@ import { useOrdersStore } from "../orders/orders.store";
 import PurchaseScreen from "../orders/components/PurchaseScreen";
 import OrderScreen from "../orders/components/OrderScreen";
 import ProfileAddressScreen from "../profile/ProfileAddressScreen";
+import ConfirmOrderScreen from "../cart/components/ConfirmOrderScreen";
 
 const ShopLayout: React.FC = () => {
   const [presentToast] = useIonToast();
@@ -279,6 +280,11 @@ const ShopLayout: React.FC = () => {
             component={ProductScreen}
           />
           <Route exact path={`${basePath}/cart`} component={CartScreen} />
+          <Route
+            exact
+            path={`${basePath}/cart/confirm`}
+            component={ConfirmOrderScreen}
+          />
           <Route
             exact
             path={`${basePath}/purchases`}
