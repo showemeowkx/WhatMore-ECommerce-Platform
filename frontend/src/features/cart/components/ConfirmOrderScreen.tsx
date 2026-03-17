@@ -24,11 +24,12 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../auth/auth.store";
 import { useCartStore } from "../cart.store";
 import api from "../../../config/api";
+import AddressModal from "../../profile/components/AddressModal";
 
 const ConfirmOrderScreen: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const { fetchCart } = useCartStore();
 
   const isDesktop = isPlatform("desktop");
@@ -36,6 +37,14 @@ const ConfirmOrderScreen: React.FC = () => {
 
   const hasDefaultAddress = !!user?.deliveryAddress;
   const [useDefaultAddress, setUseDefaultAddress] = useState(hasDefaultAddress);
+
+  const [customAddress, setCustomAddress] = useState<{
+    street: string;
+    streetNumber: string;
+    apartment: string;
+  } | null>(null);
+
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [comment, setComment] = useState("");
@@ -54,6 +63,8 @@ const ConfirmOrderScreen: React.FC = () => {
   useEffect(() => {
     if (!user?.deliveryAddress) {
       setUseDefaultAddress(false);
+    } else {
+      setUseDefaultAddress(true);
     }
   }, [user?.deliveryAddress]);
 
@@ -70,15 +81,65 @@ const ConfirmOrderScreen: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleAddressSave = async (data: {
+    street: string;
+    streetNumber: string;
+    apartment: string;
+  }) => {
+    if (!hasDefaultAddress) {
+      try {
+        setIsSubmitting(true);
+        await api.patch("/auth", {
+          deliveryAddress: data.street,
+          streetNumber: data.streetNumber,
+          apartment: data.apartment,
+        });
+
+        updateUser({
+          deliveryAddress: data.street,
+          streetNumber: data.streetNumber,
+          apartment: data.apartment,
+        });
+
+        presentToast({
+          message: "Адресу успішно збережено",
+          duration: 2000,
+          color: "success",
+        });
+        setUseDefaultAddress(true);
+      } catch (error) {
+        console.error("Не вдалося зберегти адресу:", error);
+        presentToast({
+          message: "Помилка при збереженні адреси",
+          duration: 3000,
+          color: "danger",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      setCustomAddress({
+        street: data.street,
+        streetNumber: data.streetNumber,
+        apartment: data.apartment,
+      });
+      setUseDefaultAddress(false);
+    }
+  };
+
   const handleSubmitOrder = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
       const payload = {
-        deliveryAddress: user?.deliveryAddress,
-        streetNumber: user?.streetNumber || "",
-        paymentMethod: paymentMethod.toUpperCase() as "CASH" | "CARD_TERMINAL",
+        deliveryAddress: useDefaultAddress
+          ? user?.deliveryAddress
+          : customAddress?.street,
+        streetNumber: useDefaultAddress
+          ? user?.streetNumber || ""
+          : customAddress?.streetNumber || "",
+        paymentMethod: paymentMethod === "cash" ? "CASH" : "CARD_TERMINAL",
         comment: comment.trim() || undefined,
       };
 
@@ -100,8 +161,15 @@ const ConfirmOrderScreen: React.FC = () => {
   };
 
   const formattedAddress = user?.deliveryAddress
-    ? `м. Фастів, вул. ${user.deliveryAddress}${user.streetNumber ? `, буд. ${user.streetNumber}` : ""}${user.apartment ? `, кв. ${user.apartment}` : ""}`
+    ? `м. Фастів, вул. ${user.deliveryAddress}${
+        user.streetNumber ? `, буд. ${user.streetNumber}` : ""
+      }${user.apartment ? `, кв. ${user.apartment}` : ""}`
     : "Адресу не встановлено";
+
+  const isSubmitDisabled =
+    (useDefaultAddress && !hasDefaultAddress) ||
+    (!useDefaultAddress && !customAddress) ||
+    isSubmitting;
 
   if (isSuccess) {
     return (
@@ -214,8 +282,18 @@ const ConfirmOrderScreen: React.FC = () => {
 
                     <hr className="border-gray-100 my-4" />
 
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <div className="relative flex items-center justify-center w-6 h-6">
+                    <label
+                      className={`flex ${
+                        !useDefaultAddress && customAddress
+                          ? "items-start"
+                          : "items-center"
+                      } gap-3 cursor-pointer`}
+                    >
+                      <div
+                        className={`relative flex items-center justify-center w-6 h-6 ${
+                          !useDefaultAddress && customAddress ? "mt-0.5" : ""
+                        }`}
+                      >
                         <input
                           type="radio"
                           name="addressOption"
@@ -225,22 +303,41 @@ const ConfirmOrderScreen: React.FC = () => {
                         />
                         <div className="absolute w-3 h-3 bg-black rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                       </div>
-                      <span className="font-bold text-gray-800 text-base">
-                        Доставити за іншою адресою
-                      </span>
+                      <div className="flex flex-col flex-1">
+                        <span
+                          className={`font-bold text-gray-800 text-base ${
+                            !useDefaultAddress && customAddress ? "mb-1" : ""
+                          }`}
+                        >
+                          Доставити за іншою адресою
+                        </span>
+                        {!useDefaultAddress && customAddress && (
+                          <span className="text-sm font-medium text-gray-500 leading-snug">
+                            м. Фастів, вул. {customAddress.street}
+                            {customAddress.streetNumber
+                              ? `, буд. ${customAddress.streetNumber}`
+                              : ""}
+                            {customAddress.apartment
+                              ? `, кв. ${customAddress.apartment}`
+                              : ""}
+                          </span>
+                        )}
+                      </div>
                     </label>
 
                     <div className="mt-4 md:mt-5 pl-9">
                       <button
                         disabled={useDefaultAddress}
-                        onClick={() => {}}
+                        onClick={() => setIsAddressModalOpen(true)}
                         className={`w-full py-3 rounded-2xl font-bold text-sm transition-all border-2 outline-none select-none ${
                           useDefaultAddress
                             ? "bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-black border-black text-white hover:bg-gray-800 active:scale-95"
                         }`}
                       >
-                        Ввести іншу адресу
+                        {customAddress
+                          ? "Змінити адресу"
+                          : "Ввести іншу адресу"}
                       </button>
                     </div>
                   </>
@@ -250,7 +347,7 @@ const ConfirmOrderScreen: React.FC = () => {
                       Ви ще не додали адресу доставки
                     </p>
                     <button
-                      onClick={() => {}}
+                      onClick={() => setIsAddressModalOpen(true)}
                       className="w-full py-3 rounded-2xl font-bold text-sm transition-all border-2 border-black outline-none select-none bg-black text-white hover:bg-gray-800 active:scale-95"
                     >
                       Ввести адресу
@@ -357,10 +454,10 @@ const ConfirmOrderScreen: React.FC = () => {
             {isDesktop && (
               <div className="pt-2 pb-8">
                 <button
-                  disabled={!hasDefaultAddress || isSubmitting}
+                  disabled={isSubmitDisabled}
                   onClick={handleSubmitOrder}
                   className={`w-full py-4 rounded-2xl font-bold text-lg transition-all outline-none select-none ${
-                    !hasDefaultAddress || isSubmitting
+                    isSubmitDisabled
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-black text-white hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200"
                   }`}
@@ -377,10 +474,10 @@ const ConfirmOrderScreen: React.FC = () => {
         <IonFooter className="ion-no-border bg-white md:hidden shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-safe">
           <div className="px-4 py-3">
             <button
-              disabled={!hasDefaultAddress || isSubmitting}
+              disabled={isSubmitDisabled}
               onClick={handleSubmitOrder}
               className={`w-full py-4 rounded-2xl font-bold text-lg transition-all outline-none select-none ${
-                !hasDefaultAddress || isSubmitting
+                isSubmitDisabled
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-black text-white hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200"
               }`}
@@ -390,6 +487,12 @@ const ConfirmOrderScreen: React.FC = () => {
           </div>
         </IonFooter>
       )}
+
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onDidDismiss={() => setIsAddressModalOpen(false)}
+        onSave={handleAddressSave}
+      />
     </IonPage>
   );
 };
