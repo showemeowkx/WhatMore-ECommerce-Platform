@@ -18,21 +18,23 @@ import {
   checkmarkOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
+import { useAuthStore } from "../../auth/auth.store";
 
 const ConfirmOrderScreen: React.FC = () => {
   const history = useHistory();
+  const { user } = useAuthStore();
 
   const isDesktop = isPlatform("desktop");
 
-  const [useDefaultAddress, setUseDefaultAddress] = useState(true);
+  const hasDefaultAddress = !!user?.deliveryAddress;
+  const [useDefaultAddress, setUseDefaultAddress] = useState(hasDefaultAddress);
+
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [comment, setComment] = useState("");
 
-  // Стани для кастомного дропдауну оплати (як у OrdersScreen)
   const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState(false);
   const paymentRef = useRef<HTMLDivElement>(null);
 
-  // Закриття дропдауну при кліку поза ним (як у OrdersScreen)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -45,6 +47,10 @@ const ConfirmOrderScreen: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const formattedAddress = user?.deliveryAddress
+    ? `м. Фастів, вул. ${user.deliveryAddress}${user.streetNumber ? `, буд. ${user.streetNumber}` : ""}${user.apartment ? `, кв. ${user.apartment}` : ""}`
+    : "Адресу не встановлено";
 
   return (
     <IonPage>
@@ -69,7 +75,6 @@ const ConfirmOrderScreen: React.FC = () => {
         fullscreen
       >
         <div className="container mx-auto px-4 py-4 md:py-12 md:mt-20 max-w-2xl h-full flex flex-col md:block animate-fade-in md:pb-32">
-          {/* Десктопний хедер */}
           <div className="flex items-center gap-4 mb-8 hidden md:flex shrink-0">
             <button
               onClick={() => history.goBack()}
@@ -93,62 +98,77 @@ const ConfirmOrderScreen: React.FC = () => {
               </h2>
 
               <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-4 md:p-5">
-                <label className="flex items-start gap-3 cursor-pointer mb-4">
-                  <div className="relative flex items-center justify-center w-6 h-6 mt-0.5">
-                    <input
-                      type="radio"
-                      name="addressOption"
-                      checked={useDefaultAddress}
-                      onChange={() => setUseDefaultAddress(true)}
-                      className="peer appearance-none w-6 h-6 border-2 border-gray-300 rounded-full checked:border-black transition-colors outline-none"
-                    />
-                    <div className="absolute w-3 h-3 bg-black rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    <span className="font-bold text-gray-800 text-base mb-1">
-                      Моя адреса
-                    </span>
-                    <span className="text-sm font-medium text-gray-500 leading-snug">
-                      м. Фастів, вул. Соборна, буд. 42, кв. 12
-                    </span>
-                  </div>
-                </label>
+                {hasDefaultAddress ? (
+                  <>
+                    <label className="flex items-start gap-3 cursor-pointer mb-4">
+                      <div className="relative flex items-center justify-center w-6 h-6 mt-0.5">
+                        <input
+                          type="radio"
+                          name="addressOption"
+                          checked={useDefaultAddress}
+                          onChange={() => setUseDefaultAddress(true)}
+                          className="peer appearance-none w-6 h-6 border-2 border-gray-300 rounded-full checked:border-black transition-colors outline-none"
+                        />
+                        <div className="absolute w-3 h-3 bg-black rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                      </div>
+                      <div className="flex flex-col flex-1">
+                        <span className="font-bold text-gray-800 text-base mb-1">
+                          Моя адреса
+                        </span>
+                        <span className="text-sm font-medium text-gray-500 leading-snug">
+                          {formattedAddress}
+                        </span>
+                      </div>
+                    </label>
 
-                <hr className="border-gray-100 my-4" />
+                    <hr className="border-gray-100 my-4" />
 
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <div className="relative flex items-center justify-center w-6 h-6">
-                    <input
-                      type="radio"
-                      name="addressOption"
-                      checked={!useDefaultAddress}
-                      onChange={() => setUseDefaultAddress(false)}
-                      className="peer appearance-none w-6 h-6 border-2 border-gray-300 rounded-full checked:border-black transition-colors outline-none"
-                    />
-                    <div className="absolute w-3 h-3 bg-black rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <div className="relative flex items-center justify-center w-6 h-6">
+                        <input
+                          type="radio"
+                          name="addressOption"
+                          checked={!useDefaultAddress}
+                          onChange={() => setUseDefaultAddress(false)}
+                          className="peer appearance-none w-6 h-6 border-2 border-gray-300 rounded-full checked:border-black transition-colors outline-none"
+                        />
+                        <div className="absolute w-3 h-3 bg-black rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                      </div>
+                      <span className="font-bold text-gray-800 text-base">
+                        Доставити за іншою адресою
+                      </span>
+                    </label>
+
+                    <div className="mt-4 md:mt-5 pl-9">
+                      <button
+                        disabled={useDefaultAddress}
+                        onClick={() => {}}
+                        className={`w-full py-3 rounded-2xl font-bold text-sm transition-all border-2 outline-none select-none ${
+                          useDefaultAddress
+                            ? "bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-black border-black text-white hover:bg-gray-800 active:scale-95"
+                        }`}
+                      >
+                        Ввести іншу адресу
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <p className="text-gray-500 text-sm mb-4">
+                      Ви ще не додали адресу доставки
+                    </p>
+                    <button
+                      onClick={() => {}}
+                      className="w-full py-3 rounded-2xl font-bold text-sm transition-all border-2 border-black outline-none select-none bg-black text-white hover:bg-gray-800 active:scale-95"
+                    >
+                      Ввести адресу
+                    </button>
                   </div>
-                  <span className="font-bold text-gray-800 text-base">
-                    Доставити за іншою адресою
-                  </span>
-                </label>
-
-                <div className="mt-4 md:mt-5 pl-9">
-                  <button
-                    disabled={useDefaultAddress}
-                    onClick={() => {}}
-                    className={`w-full py-3 rounded-2xl font-bold text-sm transition-all border-2 outline-none select-none ${
-                      useDefaultAddress
-                        ? "bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-black border-black text-white hover:bg-gray-800 active:scale-95"
-                    }`}
-                  >
-                    Ввести іншу адресу
-                  </button>
-                </div>
+                )}
               </div>
             </div>
 
-            {/* БЛОК ОПЛАТИ (Точна копія з OrdersScreen) */}
             <div className="shrink-0 relative z-20">
               <h2 className="text-lg font-black text-gray-800 mb-3 md:mb-4 pl-1 flex items-center gap-2">
                 <IonIcon
@@ -246,8 +266,13 @@ const ConfirmOrderScreen: React.FC = () => {
             {isDesktop && (
               <div className="pt-2 pb-8">
                 <button
+                  disabled={!hasDefaultAddress}
                   onClick={() => {}}
-                  className="w-full py-4 bg-black text-white rounded-2xl font-bold text-lg hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200 transition-all outline-none select-none"
+                  className={`w-full py-4 rounded-2xl font-bold text-lg transition-all outline-none select-none ${
+                    !hasDefaultAddress
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-black text-white hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200"
+                  }`}
                 >
                   Підтвердити замовлення
                 </button>
@@ -261,8 +286,13 @@ const ConfirmOrderScreen: React.FC = () => {
         <IonFooter className="ion-no-border bg-white md:hidden shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-safe">
           <div className="px-4 py-3">
             <button
+              disabled={!hasDefaultAddress}
               onClick={() => {}}
-              className="w-full py-4 bg-black text-white rounded-2xl font-bold text-lg hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200 transition-all outline-none select-none"
+              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all outline-none select-none ${
+                !hasDefaultAddress
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-black text-white hover:bg-gray-800 active:scale-95 shadow-md shadow-gray-200"
+              }`}
             >
               Підтвердити замовлення
             </button>
