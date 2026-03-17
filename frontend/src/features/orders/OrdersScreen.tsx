@@ -38,7 +38,7 @@ interface Store {
 
 const STATUS_OPTIONS = [
   { value: "IN PROCESS", label: "У процесі обробки" },
-  { value: "READY", label: "Готово до отримання" },
+  { value: "IN DELIVERY", label: "Доставляється" },
   { value: "COMPLETED", label: "Виконано" },
   { value: "CANCELLED", label: "Скасовано" },
 ];

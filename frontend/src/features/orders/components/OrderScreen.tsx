@@ -17,11 +17,13 @@ import {
   receiptOutline,
   closeCircleOutline,
   alertCircleOutline,
+  locationOutline,
+  walletOutline,
+  chatbubbleOutline,
 } from "ionicons/icons";
 import { useHistory, useParams } from "react-router-dom";
 import api from "../../../config/api";
 
-// ТИПИ НА ОСНОВІ ТВОЇХ СУТНОСТЕЙ БЕКЕНДУ
 interface User {
   id: number;
   firstName: string;
@@ -61,6 +63,11 @@ interface Order {
   store?: Store;
   user?: User;
   paymentId?: string;
+  deliveryAddress?: string;
+  streetNumber?: string;
+  apartment?: string;
+  paymentMethod?: string;
+  comment?: string;
   items: OrderItem[];
 }
 
@@ -182,7 +189,7 @@ const OrderScreen: React.FC = () => {
         return "text-green-600 bg-green-50 border-green-100";
       case "READY":
         return "text-yellow-600 bg-yellow-100 border-yellow-200";
-      case "IN PROCESS":
+      case "IN DELIVERY":
         return "text-blue-600 bg-blue-50 border-blue-100";
       case "CANCELLED":
         return "text-red-600 bg-red-50 border-red-100";
@@ -195,8 +202,8 @@ const OrderScreen: React.FC = () => {
     switch (currentStatus.toUpperCase()) {
       case "COMPLETED":
         return "Виконано";
-      case "READY":
-        return "Готово до отримання";
+      case "IN DELIVERY":
+        return "Доставляється";
       case "IN PROCESS":
         return "У процесі обробки";
       case "CANCELLED":
@@ -210,7 +217,7 @@ const OrderScreen: React.FC = () => {
     if (!order) return "";
     if (order.status === "IN PROCESS") {
       return "Переконайтеся, що створили заявку в системі обліку УкрСклад перед продовженням. Ви впевнені, що хочете оновити статус?";
-    } else if (order.status === "READY") {
+    } else if (order.status === "IN DELIVERY") {
       return "Переконайтеся, що клієнт отримав замовлення перед продовженням. Ви впевнені, що хочете оновити статус?";
     }
     return "Ви впевнені, що хочете оновити статус цього замовлення?";
@@ -219,8 +226,8 @@ const OrderScreen: React.FC = () => {
   const getNextStatus = (currentStatus: string) => {
     switch (currentStatus.toUpperCase()) {
       case "IN PROCESS":
-        return "READY";
-      case "READY":
+        return "IN DELIVERY";
+      case "IN DELIVERY":
         return "COMPLETED";
       default:
         return "-";
@@ -352,14 +359,55 @@ const OrderScreen: React.FC = () => {
                       {order.user?.phone || "Не вказано"}
                     </span>
                   </div>
+                </div>
+              </div>
 
-                  <div className="flex justify-between items-center pt-1">
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4">
+                <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                  <IonIcon
+                    icon={locationOutline}
+                    className="text-black text-3xl pr-3"
+                  />
+                  Інформація про доставку
+                </h2>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between items-center border-b border-gray-50 pb-3">
+                    <span className="text-sm font-medium text-gray-500">
+                      Адреса доставки
+                    </span>
+                    <span className="text-sm font-bold text-gray-800 text-right max-w-[60%]">
+                      {order.deliveryAddress
+                        ? `${order.deliveryAddress}${
+                            order.streetNumber
+                              ? `, буд. ${order.streetNumber}`
+                              : ""
+                          }${order.apartment ? `, кв. ${order.apartment}` : ""}`
+                        : "Не вказано"}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span className="text-sm font-medium text-gray-500 flex items-center gap-1.5">
-                      <IonIcon icon={receiptOutline} /> ID Транзакції
+                      <IonIcon icon={walletOutline} /> Спосіб оплати
                     </span>
-                    <span className="text-xs font-mono font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
-                      {order.paymentId || "N/A"}
+                    <span className="text-sm font-bold text-gray-800 text-right">
+                      {order.paymentMethod === "CARD" ||
+                      order.paymentMethod === "CARD_TERMINAL"
+                        ? "Карткою"
+                        : order.paymentMethod === "CASH"
+                          ? "Готівкою"
+                          : order.paymentMethod || "Не вказано"}
                     </span>
+                  </div>
+
+                  <div className="flex flex-col gap-2 pt-1">
+                    <span className="text-sm font-medium text-gray-500 flex items-center gap-1.5">
+                      <IonIcon icon={chatbubbleOutline} /> Коментар
+                    </span>
+                    <div className="text-sm font-bold text-gray-800 bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-100 min-h-[40px]">
+                      {order.comment || "Не вказано"}
+                    </div>
                   </div>
                 </div>
               </div>
