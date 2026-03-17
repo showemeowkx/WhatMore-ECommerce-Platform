@@ -52,6 +52,9 @@ export class User {
   deliveryAddress: string;
 
   @Column({ nullable: true })
+  streetNumber: string;
+
+  @Column({ nullable: true })
   apartment: string;
 
   @Column({ default: false })

@@ -47,6 +47,9 @@ export class Order {
   deliveryAddress: string;
 
   @Column({ nullable: true })
+  streetNumber: string;
+
+  @Column({ nullable: true })
   apartment: string;
 
   @Column({ type: 'enum', enum: ['CASH', 'CARD_TERMINAL'] })

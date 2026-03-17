@@ -138,6 +138,7 @@ export class OrdersService {
         storeId: user.selectedStoreId,
         store: user.selectedStore,
         deliveryAddress: deliverySpecs.deliveryAddress,
+        streetNumber: deliverySpecs.streetNumber,
         apartment: deliverySpecs.apartment,
         paymentMethod: deliverySpecs.paymentMethod,
         comment: deliverySpecs.comment,

@@ -58,5 +58,9 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @IsString()
   @IsOptional()
+  streetNumber?: string;
+
+  @IsString()
+  @IsOptional()
   apartment?: string;
 }

@@ -13,6 +13,10 @@ export class DeliverySpecificationsDto {
 
   @IsString()
   @IsNotEmpty()
+  streetNumber: string;
+
+  @IsString()
+  @IsNotEmpty()
   @IsOptional()
   apartment: string;
 
