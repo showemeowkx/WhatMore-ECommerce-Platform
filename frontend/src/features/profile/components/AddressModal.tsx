@@ -31,6 +31,8 @@ const AddressModal: React.FC<AddressModalProps> = ({
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const [isStreetSelected, setIsStreetSelected] = useState(false);
   const isSelectingRef = useRef(false);
 
   useEffect(() => {
@@ -46,6 +48,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
       setApartment("");
       setSearchResults([]);
       setShowDropdown(false);
+      setIsStreetSelected(false);
     }
   }, [isOpen]);
 
@@ -88,6 +91,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
   const handleSelectStreet = (selectedStreet: string) => {
     isSelectingRef.current = true;
     setStreet(selectedStreet);
+    setIsStreetSelected(true);
     setShowDropdown(false);
   };
 
@@ -132,9 +136,10 @@ const AddressModal: React.FC<AddressModalProps> = ({
                       <IonInput
                         type="text"
                         value={street}
-                        onIonInput={(e) =>
-                          setStreet((e.detail.value as string) || "")
-                        }
+                        onIonInput={(e) => {
+                          setStreet((e.detail.value as string) || "");
+                          setIsStreetSelected(false);
+                        }}
                         color="medium"
                         className="font-medium text-gray-800"
                         placeholder="Назва вулиці..."
@@ -233,15 +238,15 @@ const AddressModal: React.FC<AddressModalProps> = ({
 
             <IonButton
               expand="block"
-              disabled={!street.trim() || !streetNumber.trim()}
+              disabled={!isStreetSelected || !streetNumber.trim()}
               onClick={() => {}}
               className={`h-14 mt-4 font-black text-lg ${
-                !street.trim() || !streetNumber.trim() ? "opacity-50" : ""
+                !isStreetSelected || !streetNumber.trim() ? "opacity-50" : ""
               }`}
               style={{
                 "--border-radius": "30px",
                 "--box-shadow":
-                  street.trim() && streetNumber.trim()
+                  isStreetSelected && streetNumber.trim()
                     ? "0 12px 24px -6px rgba(60, 60, 60, 0.4)"
                     : "none",
               }}
@@ -259,8 +264,8 @@ const AddressModal: React.FC<AddressModalProps> = ({
     <IonModal
       isOpen={isOpen}
       onDidDismiss={onDidDismiss}
-      breakpoints={isDesktop ? undefined : [0, 0.75, 0.9]}
-      initialBreakpoint={isDesktop ? undefined : 0.75}
+      breakpoints={isDesktop ? undefined : [0, 0.95, 0.9]}
+      initialBreakpoint={isDesktop ? undefined : 0.95}
       style={
         isDesktop
           ? {
