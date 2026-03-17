@@ -139,6 +139,9 @@ const ConfirmOrderScreen: React.FC = () => {
         streetNumber: useDefaultAddress
           ? user?.streetNumber || ""
           : customAddress?.streetNumber || "",
+        apartment: useDefaultAddress
+          ? user?.apartment || undefined
+          : customAddress?.apartment || undefined,
         paymentMethod: paymentMethod === "cash" ? "CASH" : "CARD_TERMINAL",
         comment: comment.trim() || undefined,
       };

@@ -16,9 +16,8 @@ export class DeliverySpecificationsDto {
   streetNumber: string;
 
   @IsString()
-  @IsNotEmpty()
   @IsOptional()
-  apartment: string;
+  apartment?: string;
 
   @IsEnum(['CASH', 'CARD_TERMINAL'])
   @IsNotEmpty()
