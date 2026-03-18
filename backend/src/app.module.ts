@@ -29,15 +29,18 @@ import { DeliveryModule } from './delivery/delivery.module';
       database: process.env.POSTGRES_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
+      ssl:
+        process.env.NODE_ENV === 'prod' ? { rejectUnauthorized: false } : false,
     }),
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         store: await redisStore({
+          url: configService.get<string>('REDIS_URL'),
           socket: {
-            host: configService.get<string>('REDIS_HOST') || 'cache',
-            port: configService.get<number>('REDIS_PORT') || 6379,
+            tls: configService.get<string>('NODE_ENV') === 'prod',
+            rejectUnauthorized: false,
           },
           ttl:
             configService.get<number>('CACHE_TTL_MILISECONDS') ||
