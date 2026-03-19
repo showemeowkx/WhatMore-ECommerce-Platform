@@ -11,7 +11,6 @@ import {
   IonRefresherContent,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  isPlatform,
   useIonViewWillEnter,
   useIonViewWillLeave,
   IonModal,
@@ -46,6 +45,7 @@ import SmallProductCard from "./components/SmallProductCard";
 import type { FilterState } from "./components/FilterMenu";
 import FilterMenu from "./components/FilterMenu";
 import { getDefaultAddQuantity, useCartStore } from "../cart/cart.store";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
 
 const MAX_PRICE_LIMIT = Number(import.meta.env.VITE_MAX_PRICE_LIMIT) || 2500;
 
@@ -148,10 +148,11 @@ const ShopScreen: React.FC = () => {
 
   const categoriesRef = useRef<HTMLDivElement>(null);
 
+  const isDesktop = useIsDesktop();
+
   const fetchStores = useCallback(async () => {
     try {
-      const isAdminOnDesktop =
-        (user?.isAdmin || isAdminRoute) && isPlatform("desktop");
+      const isAdminOnDesktop = (user?.isAdmin || isAdminRoute) && isDesktop;
       const showInactive = isAdminOnDesktop ? 1 : 0;
 
       const { data } = await api.get(
@@ -161,12 +162,11 @@ const ShopScreen: React.FC = () => {
     } catch (e) {
       console.error("Failed to fetch stores", e);
     }
-  }, [user, isAdminRoute]);
+  }, [user, isAdminRoute, isDesktop]);
 
   const fetchCategories = useCallback(async () => {
     try {
-      const isAdminOnDesktop =
-        (user?.isAdmin || isAdminRoute) && isPlatform("desktop");
+      const isAdminOnDesktop = (user?.isAdmin || isAdminRoute) && isDesktop;
       const showInactive = isAdminOnDesktop ? 1 : 0;
       const { data } = await api.get(
         `/categories?limit=0&showInactive=${showInactive}&showDeleted=0`,
@@ -175,7 +175,7 @@ const ShopScreen: React.FC = () => {
     } catch (e) {
       console.error("Failed to fetch categories", e);
     }
-  }, [user?.isAdmin, isAdminRoute]);
+  }, [user?.isAdmin, isAdminRoute, isDesktop]);
 
   const fetchProducts = useCallback(
     async (storeId: number, pageNum: number, isLoadMore: boolean = false) => {
@@ -285,7 +285,7 @@ const ShopScreen: React.FC = () => {
   }, [user?.selectedStoreId, token, fetchProducts]);
 
   useEffect(() => {
-    if (isPlatform("desktop")) return;
+    if (isDesktop) return;
 
     const tabBar = document.querySelector("ion-tab-bar");
     if (tabBar) {
@@ -293,7 +293,7 @@ const ShopScreen: React.FC = () => {
     }
 
     return () => {
-      if (tabBar && !isPlatform("desktop")) {
+      if (tabBar && !isDesktop) {
         tabBar.style.display = "";
       }
     };
@@ -322,14 +322,14 @@ const ShopScreen: React.FC = () => {
   }, [searchQuery, isSearchActive, fetchSearchResults, hasActiveFilters]);
 
   useIonViewWillLeave(() => {
-    if (!isPlatform("desktop")) {
+    if (!isDesktop) {
       const tabBar = document.querySelector("ion-tab-bar");
       if (tabBar) tabBar.style.display = "";
     }
   });
 
   useIonViewWillEnter(() => {
-    if (!isPlatform("desktop") && isSearchActive) {
+    if (!isDesktop && isSearchActive) {
       const tabBar = document.querySelector("ion-tab-bar");
       if (tabBar) tabBar.style.display = "none";
     }
@@ -534,7 +534,7 @@ const ShopScreen: React.FC = () => {
         stores={stores}
       />
 
-      {!isPlatform("desktop") && (
+      {!isDesktop && (
         <FilterMenu
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
@@ -698,7 +698,7 @@ const ShopScreen: React.FC = () => {
                   )}
                 </div>
 
-                {isPlatform("desktop") && (
+                {isDesktop && (
                   <FilterMenu
                     isOpen={isFilterOpen}
                     onClose={() => setIsFilterOpen(false)}
@@ -753,7 +753,7 @@ const ShopScreen: React.FC = () => {
                         key={cat.id}
                         name={cat.name}
                         image={cat.iconPath}
-                        isAdminOnDesktop={isAdminRoute && isPlatform("desktop")}
+                        isAdminOnDesktop={isAdminRoute && isDesktop}
                         isActive={cat.isActive}
                         onClick={() => handleCategoryClick(cat.id)}
                         onEdit={(e) => {
@@ -870,7 +870,7 @@ const ShopScreen: React.FC = () => {
                   ) : (
                     <div className="md:grid md:grid-cols-4 md:gap-6 flex flex-col">
                       {searchProducts.map((product) =>
-                        isPlatform("desktop") ? (
+                        isDesktop ? (
                           <ProductCard
                             key={product.id}
                             name={product.name}
@@ -958,7 +958,7 @@ const ShopScreen: React.FC = () => {
           />
         </IonInfiniteScroll>
 
-        {isSearchActive && !isPlatform("desktop") && (
+        {isSearchActive && !isDesktop && (
           <div
             slot="fixed"
             className="bottom-6 right-6 z-50 animate-fade-in-up"

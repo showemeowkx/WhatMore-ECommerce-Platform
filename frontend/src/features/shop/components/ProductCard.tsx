@@ -1,6 +1,7 @@
 import React from "react";
-import { IonIcon, isPlatform } from "@ionic/react";
+import { IonIcon } from "@ionic/react";
 import { add } from "ionicons/icons";
+import { useIsDesktop } from "../../../hooks/useIsDesktop";
 
 interface ProductCardProps {
   name: string;
@@ -37,6 +38,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const isUnavailable = !isActive || isOutOfStock || isCategoryActive === false;
 
+  const isDesktop = useIsDesktop();
+
   return (
     <div
       onClick={onClick}
@@ -62,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {isAdmin && isPlatform("desktop") && code && (
+        {isAdmin && isDesktop && code && (
           <div className="absolute top-2 right-2 bg-gray-800 text-white text-[10px] font-mono font-bold px-2 py-1 rounded-lg shadow-sm z-10">
             {code}
           </div>
@@ -107,7 +110,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="flex flex-col flex-grow">
         <h3
           className={`font-bold text-gray-800 ${
-            isPlatform("desktop") ? "text-sm" : "text-xs"
+            isDesktop ? "text-sm" : "text-xs"
           } mb-0.5 leading-tight line-clamp-2`}
         >
           {name}

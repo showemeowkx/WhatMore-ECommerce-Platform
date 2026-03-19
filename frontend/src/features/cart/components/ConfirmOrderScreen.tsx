@@ -7,7 +7,6 @@ import {
   IonIcon,
   IonContent,
   IonFooter,
-  isPlatform,
   useIonToast,
   useIonViewWillEnter,
 } from "@ionic/react";
@@ -25,6 +24,7 @@ import { useAuthStore } from "../../auth/auth.store";
 import { useCartStore } from "../cart.store";
 import api from "../../../config/api";
 import AddressModal from "../../profile/components/AddressModal";
+import { useIsDesktop } from "../../../hooks/useIsDesktop";
 
 const ConfirmOrderScreen: React.FC = () => {
   const history = useHistory();
@@ -32,7 +32,7 @@ const ConfirmOrderScreen: React.FC = () => {
   const { user, updateUser } = useAuthStore();
   const { fetchCart } = useCartStore();
 
-  const isDesktop = isPlatform("desktop");
+  const isDesktop = useIsDesktop();
   const basePath = location.pathname.startsWith("/admin") ? "/admin" : "/app";
 
   const hasDefaultAddress = !!user?.deliveryAddress;

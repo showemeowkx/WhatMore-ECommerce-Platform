@@ -7,7 +7,6 @@ import {
   IonToolbar,
   IonButton,
   IonIcon,
-  isPlatform,
   useIonViewWillEnter,
   useIonViewWillLeave,
   IonSpinner,
@@ -31,6 +30,7 @@ import { useAuthStore } from "../../auth/auth.store";
 import api from "../../../config/api";
 import ProductCard from "./ProductCard";
 import { getDefaultAddQuantity, useCartStore } from "../../cart/cart.store";
+import { useIsDesktop } from "../../../hooks/useIsDesktop";
 
 interface Stock {
   id: number;
@@ -73,10 +73,10 @@ const ProductScreen: React.FC = () => {
   const alikeSliderRef = useRef<HTMLDivElement>(null);
   const [presentToast] = useIonToast();
 
+  const isDesktop = useIsDesktop();
   const isAdminRoute = location.pathname.startsWith("/admin");
   const basePath = isAdminRoute ? "/admin" : "/app";
-  const isAdminOnDesktop =
-    (user?.isAdmin || isAdminRoute) && isPlatform("desktop");
+  const isAdminOnDesktop = (user?.isAdmin || isAdminRoute) && isDesktop;
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -195,14 +195,14 @@ const ProductScreen: React.FC = () => {
 
   useIonViewWillEnter(() => {
     fetchProduct(false);
-    if (!isPlatform("desktop")) {
+    if (!isDesktop) {
       const tabBar = document.querySelector("ion-tab-bar");
       if (tabBar) tabBar.style.display = "none";
     }
   });
 
   useIonViewWillLeave(() => {
-    if (!isPlatform("desktop")) {
+    if (!isDesktop) {
       const tabBar = document.querySelector("ion-tab-bar");
       if (tabBar) tabBar.style.display = "";
     }
@@ -473,7 +473,7 @@ const ProductScreen: React.FC = () => {
                   </span>
                 )}
 
-                {user?.isAdmin && isPlatform("desktop") && product.code && (
+                {user?.isAdmin && isDesktop && product.code && (
                   <span className="ml-1 text-xs bg-gray-800 text-white px-2.5 py-1 rounded-lg font-mono font-bold shadow-sm">
                     {`Код: ${product.code}`}
                   </span>
@@ -560,7 +560,7 @@ const ProductScreen: React.FC = () => {
                 </>
               )}
 
-              {user?.isAdmin && isPlatform("desktop") && product.code && (
+              {user?.isAdmin && isDesktop && product.code && (
                 <span className="text-[10px] bg-gray-800 text-white px-2 py-0.5 rounded-md font-mono font-bold shadow-sm">
                   {product.code ? `Код: ${product.code}` : ""}
                 </span>
@@ -655,7 +655,7 @@ const ProductScreen: React.FC = () => {
           )}
         </div>
 
-        {!isPlatform("desktop") && (
+        {!isDesktop && (
           <>
             <div className="fixed bottom-32 right-5 z-50 animate-fade-in-up">
               <button
