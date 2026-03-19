@@ -42,10 +42,12 @@ export class AuthController {
   ) {}
 
   private setRefreshTokenCookie(res: Response, token: string) {
+    const isProd = this.configService.get('NODE_ENV') === 'prod';
+
     res.cookie('refreshToken', token, {
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'prod',
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
