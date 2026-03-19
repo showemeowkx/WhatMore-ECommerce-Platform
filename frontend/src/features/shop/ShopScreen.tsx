@@ -297,7 +297,7 @@ const ShopScreen: React.FC = () => {
         tabBar.style.display = "";
       }
     };
-  }, [isSearchActive]);
+  }, [isSearchActive, isDesktop]);
 
   useEffect(() => {
     if (
