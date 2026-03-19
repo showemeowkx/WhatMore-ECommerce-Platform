@@ -5,9 +5,9 @@ import {
   IonIcon,
   IonRange,
   IonToggle,
-  isPlatform,
 } from "@ionic/react";
 import { closeOutline, checkmarkOutline } from "ionicons/icons";
+import { useIsDesktop } from "../../../hooks/useIsDesktop";
 
 export interface FilterState {
   categories: number[];
@@ -52,6 +52,8 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
   const [localFilters, setLocalFilters] = useState<FilterState>(currentFilters);
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
+  const isDesktop = useIsDesktop();
+
   if (isOpen !== prevIsOpen) {
     setPrevIsOpen(isOpen);
     if (isOpen) {
@@ -78,7 +80,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
   };
 
   const handleApply = () => {
-    if (isPlatform("desktop")) {
+    if (isDesktop) {
       onApply(localFilters);
     }
     onClose();
@@ -108,7 +110,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
         >
           Очистити
         </button>
-        {!isPlatform("desktop") && (
+        {!isDesktop && (
           <button
             onClick={onClose}
             className="p-1 text-gray-400 active:text-gray-800 rounded-full bg-gray-50"
@@ -122,7 +124,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
 
   const bodyContent = (
     <div className="p-4 space-y-6 pb-6">
-      {isAdmin && isPlatform("desktop") && (
+      {isAdmin && isDesktop && (
         <section className="flex flex-col gap-4 pb-2 border-b border-gray-100/50">
           <h3 className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
             Адмін-фільтри
@@ -287,7 +289,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
     </div>
   );
 
-  const footerContent = isPlatform("desktop") ? (
+  const footerContent = isDesktop ? (
     <div className="p-4 border-t border-gray-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
       <button
         onClick={handleApply}
@@ -298,7 +300,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
     </div>
   ) : null;
 
-  if (isPlatform("desktop")) {
+  if (isDesktop) {
     if (!isOpen) return null;
     return (
       <>

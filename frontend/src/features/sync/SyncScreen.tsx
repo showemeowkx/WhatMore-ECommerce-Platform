@@ -5,13 +5,13 @@ import {
   IonContent,
   IonToggle,
   IonIcon,
-  isPlatform,
   useIonToast,
 } from "@ionic/react";
 import { syncOutline, timeOutline, alertCircleOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { useAuthStore } from "../auth/auth.store";
 import api from "../../config/api";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
 
 const SyncScreen: React.FC = () => {
   const history = useHistory();
@@ -26,7 +26,8 @@ const SyncScreen: React.FC = () => {
   const [lastRun, setLastRun] = useState<string | null>(null);
   const [nextRun, setNextRun] = useState<string | null>(null);
 
-  const isAdminOnDesktop = user?.isAdmin && isPlatform("desktop");
+  const isDesktop = useIsDesktop();
+  const isAdminOnDesktop = user?.isAdmin && isDesktop;
 
   const formatDate = (isoString: string | null) => {
     if (!isoString) return "Ніколи";

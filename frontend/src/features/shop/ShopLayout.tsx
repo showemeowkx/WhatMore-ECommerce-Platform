@@ -11,7 +11,6 @@ import {
   IonContent,
   IonToggle,
   useIonToast,
-  isPlatform,
   IonModal,
   IonAlert,
   IonBadge,
@@ -49,6 +48,7 @@ import PurchaseScreen from "../orders/components/PurchaseScreen";
 import OrderScreen from "../orders/components/OrderScreen";
 import ProfileAddressScreen from "../profile/ProfileAddressScreen";
 import ConfirmOrderScreen from "../cart/components/ConfirmOrderScreen";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
 
 const ShopLayout: React.FC = () => {
   const [presentToast] = useIonToast();
@@ -70,7 +70,8 @@ const ShopLayout: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmAlert, setShowConfirmAlert] = useState(false);
 
-  const isAdminOnDesktop = user?.isAdmin && isPlatform("desktop");
+  const isDesktop = useIsDesktop();
+  const isAdminOnDesktop = user?.isAdmin && isDesktop;
   const isAdminRoute = location.pathname.startsWith("/admin");
   const basePath = isAdminRoute ? "/admin" : "/app";
 
@@ -263,7 +264,7 @@ const ShopLayout: React.FC = () => {
   };
 
   const shouldHideTabBar =
-    !isPlatform("desktop") &&
+    !isDesktop &&
     (location.pathname.includes("/cart") ||
       location.pathname.includes("/product/") ||
       location.pathname.includes("/profile") ||
