@@ -12,6 +12,7 @@
   "dependencies": {
     "@ionic/react": "^8.7.17",
     "@ionic/react-router": "^8.7.17",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "axios": "^1.13.5",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

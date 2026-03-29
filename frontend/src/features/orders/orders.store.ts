@@ -13,9 +13,14 @@ export const useOrdersStore = create<OrdersState>()(
     (set) => ({
       hasNewOrders: false,
       lastViewedAt: null,
+
       setHasNewOrders: (status) => set({ hasNewOrders: status }),
+
       markAsViewed: () =>
-        set({ hasNewOrders: false, lastViewedAt: new Date().toISOString() }),
+        set({
+          hasNewOrders: false,
+          lastViewedAt: new Date().toISOString(),
+        }),
     }),
     {
       name: "orders-storage",

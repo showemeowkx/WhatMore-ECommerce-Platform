@@ -22,11 +22,14 @@ import RegisterScreen from "./features/auth/RegisterScreen";
 import ForgotPasswordScreen from "./features/auth/RestorePasswordScreen";
 import ShopLayout from "./features/shop/ShopLayout";
 import SelectStoreScreen from "./features/auth/SelectStoreScreen";
+import { useAdminSSE } from "./hooks/useAdminSSE";
 
 setupIonicReact();
 
 const App: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
+
+  useAdminSSE();
 
   const getHomeRoute = () => {
     if (user?.isAdmin) return "/admin";
