@@ -24,6 +24,7 @@ import { AutoClearCache } from 'src/common/decorators/auto-clear-cache.decorator
 import { CartItem } from 'src/cart/entities/cart-item.entity';
 import { SmsService } from 'src/notifications/sms.service';
 import { DeliverySpecificationsDto } from './dto/order-delivery-specs.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class OrdersService {
@@ -41,6 +42,7 @@ export class OrdersService {
     private readonly configService: ConfigService,
     private readonly syncService: SyncService,
     private readonly smsService: SmsService,
+    private readonly eventEmitter: EventEmitter2,
     @Inject(CACHE_MANAGER) public cacheManager: Cache,
   ) {}
 
@@ -168,6 +170,7 @@ export class OrdersService {
         );
       }
       await qr.commitTransaction();
+      this.eventEmitter.emit('order.created');
       this.logger.debug(`Order placed successfully! {userId: ${user.id}}`);
     } catch (error) {
       await qr.rollbackTransaction();

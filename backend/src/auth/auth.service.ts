@@ -119,6 +119,21 @@ export class AuthService {
     });
 
     if (lastCode) {
+      if (lastCode.bannedUntil && lastCode.bannedUntil.getTime() > Date.now()) {
+        const remainingSeconds = Math.ceil(
+          (lastCode.bannedUntil.getTime() - Date.now()) / 1000,
+        );
+        const minLeft = Math.floor(remainingSeconds / 60);
+        const secLeft = remainingSeconds % 60;
+        const timeLeftStr =
+          minLeft > 0 ? `${minLeft} хв ${secLeft} сек` : `${secLeft} сек`;
+
+        throw new HttpException(
+          `Номер тимчасово заблоковано через велику кількість спроб підбору. Спробуйте через ${timeLeftStr}.`,
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+
       const minutesOld =
         (Date.now() - lastCode.createdAt.getTime()) / 1000 / 60;
       if (minutesOld < 5) {
@@ -165,6 +180,21 @@ export class AuthService {
       );
     }
 
+    if (record.bannedUntil && record.bannedUntil.getTime() > Date.now()) {
+      const remainingSeconds = Math.ceil(
+        (record.bannedUntil.getTime() - Date.now()) / 1000,
+      );
+      const minLeft = Math.floor(remainingSeconds / 60);
+      const secLeft = remainingSeconds % 60;
+      const timeLeftStr =
+        minLeft > 0 ? `${minLeft} хв ${secLeft} сек` : `${secLeft} сек`;
+
+      throw new HttpException(
+        `Забагато невдалих спроб. Номер заблоковано на ${timeLeftStr}.`,
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
     const minutesOld = (Date.now() - record.createdAt.getTime()) / 1000 / 60;
     const expiresIn =
       this.configService.get<number>('VERIFICATION_CODE_EXPIRE_MINUTES') || 5;
@@ -178,7 +208,24 @@ export class AuthService {
 
     const isMatch = await bcrypt.compare(code, record.code);
     if (!isMatch) {
-      throw new BadRequestException('Неправильний код верифікації.');
+      record.attempts += 1;
+
+      if (record.attempts >= 3) {
+        record.bannedUntil = new Date(Date.now() + 5 * 60 * 1000);
+        await this.verificationCodeRepository.save(record);
+
+        throw new HttpException(
+          'Ви вичерпали ліміт спроб. Номер заблоковано на 5 хвилин.',
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+
+      await this.verificationCodeRepository.save(record);
+      const attemptsLeft = 3 - record.attempts;
+
+      throw new BadRequestException(
+        `Неправильний код верифікації. Залишилось спроб: ${attemptsLeft}`,
+      );
     }
 
     await this.verificationCodeRepository.delete({ phone });

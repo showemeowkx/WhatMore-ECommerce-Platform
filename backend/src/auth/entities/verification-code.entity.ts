@@ -16,6 +16,12 @@ export class VerificationCode {
   @Column()
   code: string;
 
+  @Column({ default: 0 })
+  attempts: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  bannedUntil: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 }
