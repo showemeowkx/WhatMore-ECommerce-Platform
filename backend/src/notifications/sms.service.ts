@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
@@ -45,6 +49,7 @@ export class SmsService {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          timeout: 5000,
         },
       );
 
@@ -62,6 +67,13 @@ export class SmsService {
         throw new Error('SMS provider error');
       }
     } catch (error) {
+      if (error.code === 'ECONNABORTED') {
+        this.logger.error('TurboSMS timeout after 5000ms');
+        throw new ServiceUnavailableException(
+          'Сервіс відправки СМС тимчасово недоступний. Спробуйте пізніше.',
+        );
+      }
+
       this.logger.error(`Failed to send SMS: ${error.stack}`);
     }
   }

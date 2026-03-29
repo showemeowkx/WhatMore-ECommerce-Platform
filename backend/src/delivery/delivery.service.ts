@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Logger,
   OnModuleInit,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
@@ -31,14 +32,18 @@ export class DeliveryService implements OnModuleInit {
     const apiKey = this.configService.get<string>('NP_API_KEY');
 
     try {
-      const response = await axios.post<NovaPoshtaResponse>(this.apiUrl, {
-        apiKey,
-        modelName: 'AddressGeneral',
-        calledMethod: 'getSettlements',
-        methodProperties: {
-          FindByString: 'фастів',
+      const response = await axios.post<NovaPoshtaResponse>(
+        this.apiUrl,
+        {
+          apiKey,
+          modelName: 'AddressGeneral',
+          calledMethod: 'getSettlements',
+          methodProperties: {
+            FindByString: 'фастів',
+          },
         },
-      });
+        { timeout: 5000 },
+      );
 
       const data = response.data;
 
@@ -49,7 +54,11 @@ export class DeliveryService implements OnModuleInit {
         this.logger.error('Failed to find Fastiv in Nova Poshta database.');
       }
     } catch (error) {
-      this.logger.error(`Failed to find Fastiv: ${error.message}`);
+      if (error.code === 'ECONNABORTED') {
+        this.logger.error('Failed to find Fastiv: NP API timeout after 5000ms');
+      } else {
+        this.logger.error(`Failed to find Fastiv: ${error.message}`);
+      }
     }
   }
 
@@ -67,15 +76,19 @@ export class DeliveryService implements OnModuleInit {
     }
 
     try {
-      const response = await axios.post<NovaPoshtaResponse>(this.apiUrl, {
-        apiKey,
-        modelName: 'AddressGeneral',
-        calledMethod: 'searchSettlementStreets',
-        methodProperties: {
-          StreetName: streetName,
-          SettlementRef: this.fastivRef,
+      const response = await axios.post<NovaPoshtaResponse>(
+        this.apiUrl,
+        {
+          apiKey,
+          modelName: 'AddressGeneral',
+          calledMethod: 'searchSettlementStreets',
+          methodProperties: {
+            StreetName: streetName,
+            SettlementRef: this.fastivRef,
+          },
         },
-      });
+        { timeout: 5000 },
+      );
 
       const data = response.data;
 
@@ -87,6 +100,12 @@ export class DeliveryService implements OnModuleInit {
 
       return outputStreets ? { data: outputStreets } : { data: [] };
     } catch (error) {
+      if (error.code === 'ECONNABORTED') {
+        this.logger.error('Nova Post API timeout after 5000ms');
+        throw new ServiceUnavailableException(
+          'Сервіс пошуку вулиць тимчасово недоступний. Спробуйте пізніше.',
+        );
+      }
       this.logger.error(`Failed to search streets: ${error.message}`);
       throw new HttpException(
         'Помилка API Нової Пошти',
