@@ -25,13 +25,24 @@ export const useAdminSSE = () => {
           Accept: "text/event-stream",
         },
         signal: abortControllerRef.current?.signal,
-        onmessage(event) {
-          const parsedData = JSON.parse(event.data);
 
-          if (parsedData.type === "NEW_ORDER") {
-            setHasNewOrders(true);
+        onmessage(event) {
+          if (!event.data) return;
+
+          try {
+            const parsedData = JSON.parse(event.data);
+
+            if (parsedData.type === "NEW_ORDER") {
+              setHasNewOrders(true);
+            }
+          } catch {
+            console.warn(
+              "Отримано не-JSON повідомлення через SSE:",
+              event.data,
+            );
           }
         },
+
         onclose() {},
         onerror(err) {
           console.error("SSE Error:", err);
