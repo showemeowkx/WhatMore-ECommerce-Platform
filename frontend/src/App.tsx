@@ -108,6 +108,10 @@ const App: React.FC = () => {
             )}
           </Route>
 
+          <Route exact path="/privacy">
+            <PrivacyScreen />
+          </Route>
+
           <Route render={() => <Redirect to="/" />} />
         </IonRouterOutlet>
       </IonReactRouter>

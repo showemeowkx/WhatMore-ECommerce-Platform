@@ -112,7 +112,7 @@ const ProfileScreen: React.FC = () => {
     {
       title: "Політика конфіденційності",
       icon: documentTextOutline,
-      path: `${basePath}/profile/policy`,
+      path: `/policy`,
     },
   ];
 

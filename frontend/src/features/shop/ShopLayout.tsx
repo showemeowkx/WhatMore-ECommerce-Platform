@@ -6,9 +6,7 @@ import {
   IonTabBar,
   IonTabButton,
   IonIcon,
-  IonPage,
   IonLabel,
-  IonContent,
   IonToggle,
   useIonToast,
   IonModal,
@@ -49,6 +47,7 @@ import OrderScreen from "../orders/components/OrderScreen";
 import ProfileAddressScreen from "../profile/ProfileAddressScreen";
 import ConfirmOrderScreen from "../cart/components/ConfirmOrderScreen";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
+import PrivacyScreen from "../../components/PrivacyScren";
 
 const ShopLayout: React.FC = () => {
   const [presentToast] = useIonToast();
@@ -317,15 +316,7 @@ const ShopLayout: React.FC = () => {
             path={`${basePath}/profile/support`}
             component={ProfileSupportScreen}
           />
-          <Route
-            exact
-            path={`${basePath}/profile/policy`}
-            render={() => (
-              <IonPage>
-                <IonContent>Політика</IonContent>
-              </IonPage>
-            )}
-          />
+          <Route exact path={`/policy`} component={PrivacyScreen} />
           <Route exact path={`${basePath}/orders`} component={OrdersScreen} />
           <Route exact path={`${basePath}/order/:id`} component={OrderScreen} />
           <Route exact path={`${basePath}/sync`} component={SyncScreen} />

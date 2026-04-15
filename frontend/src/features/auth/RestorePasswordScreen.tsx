@@ -350,8 +350,14 @@ const ForgotPasswordScreen: React.FC = () => {
               </div>
             )}
           </div>
-          <p className="mt-8 text-gray-400 text-[8px] md:text-[10px] tracking-widest">
-            Продовжуючи, Ви погоджуєтесь з нашою Політикою конфіденційності
+          <p className="mt-8 text-gray-400 text-[8px] md:text-[10px] tracking-widest text-center px-4">
+            Продовжуючи, Ви погоджуєтесь з нашою{" "}
+            <span
+              onClick={() => history.push("/privacy")}
+              className="underline cursor-pointer hover:text-gray-600 transition-colors font-bold text-gray-500"
+            >
+              Політикою конфіденційності
+            </span>
           </p>
         </div>
 
