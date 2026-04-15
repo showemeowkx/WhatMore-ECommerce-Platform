@@ -26,6 +26,7 @@ import { useAdminSSE } from "./hooks/useAdminSSE";
 
 import MobileInstallWall from "./components/MobileInstallWall";
 import { useIsPWA } from "./hooks/useIsPwa";
+import PrivacyScreen from "./components/PrivacyScren";
 
 setupIonicReact();
 
