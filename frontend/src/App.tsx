@@ -39,17 +39,15 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    const hideChromeBar = () => {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch((err) => {
-          console.log("Fullscreen API error:", err);
-        });
-      }
+    const setRealHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
     };
 
-    document.addEventListener("click", hideChromeBar, { once: true });
+    setRealHeight();
+    window.addEventListener("resize", setRealHeight);
 
-    return () => document.removeEventListener("click", hideChromeBar);
+    return () => window.removeEventListener("resize", setRealHeight);
   }, []);
 
   return (

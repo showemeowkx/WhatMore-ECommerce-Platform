@@ -150,6 +150,11 @@ ion-tab-bar {
 html,
 body,
 ion-app {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
+  height: 100vh;
+
+  height: calc(var(--vh, 1vh) * 100) !important;
+  min-height: calc(var(--vh, 1vh) * 100) !important;
+  max-height: calc(var(--vh, 1vh) * 100) !important;
+
+  overflow: hidden;
 }
