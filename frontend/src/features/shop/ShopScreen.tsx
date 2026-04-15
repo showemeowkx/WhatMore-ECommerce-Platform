@@ -545,7 +545,7 @@ const ShopScreen: React.FC = () => {
         />
       )}
 
-      <IonHeader className="ion-no-border shadow-sm z-40 bg-white md:hidden transition-all duration-300">
+      <IonHeader className="ion-no-border shadow-sm z-40 bg-white md:hidden transition-all duration-300 pt-safe">
         <IonToolbar
           className="bg-white"
           style={{ "--background": "white", "--min-height": "auto" }}

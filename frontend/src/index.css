@@ -2,7 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 14px;
+}
+
+body {
+  overscroll-behavior-y: none;
+
+  min-height: 100dvh;
+  width: 100vw;
+  background-color: #f9fafb;
+}
+
 @layer utilities {
+  .h-screen {
+    height: 100dvh !important;
+  }
+  .min-h-screen {
+    min-height: 100dvh !important;
+  }
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -18,10 +37,6 @@
     user-select: none;
     -webkit-user-select: none;
   }
-}
-
-body {
-  overscroll-behavior-y: none;
 }
 
 :root {
