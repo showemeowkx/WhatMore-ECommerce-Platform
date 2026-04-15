@@ -1,5 +1,4 @@
 import React from "react";
-import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -25,12 +24,21 @@ import ShopLayout from "./features/shop/ShopLayout";
 import SelectStoreScreen from "./features/auth/SelectStoreScreen";
 import { useAdminSSE } from "./hooks/useAdminSSE";
 
+import MobileInstallWall from "./components/MobileInstallWall";
+import { useIsPWA } from "./hooks/useIsPwa";
+
 setupIonicReact();
 
 const App: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
+  const isPWA = useIsPWA();
 
   useAdminSSE();
+
+  const isMobileDevice =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent || "",
+    );
 
   const getHomeRoute = () => {
     if (user?.isAdmin) return "/admin";
@@ -38,17 +46,9 @@ const App: React.FC = () => {
     return "/select-store";
   };
 
-  useEffect(() => {
-    const setRealHeight = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    };
-
-    setRealHeight();
-    window.addEventListener("resize", setRealHeight);
-
-    return () => window.removeEventListener("resize", setRealHeight);
-  }, []);
+  if (isMobileDevice && !isPWA) {
+    return <MobileInstallWall />;
+  }
 
   return (
     <IonApp>
