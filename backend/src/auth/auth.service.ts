@@ -163,7 +163,7 @@ export class AuthService {
     if (this.configService.get<string>('NODE_ENV') !== 'prod') {
       this.smsService.sendVerificationCodeMock(phone, rawCode);
     } else {
-      const text = `Ваш код для реєстрації "Що? Ще?": ${rawCode},\nДійсний протягом 5 хвилин.`;
+      const text = `Ваш код "Що? Ще?": ${rawCode},\nДійсний протягом 5 хвилин.`;
       await this.smsService.sendSms(phone, text);
     }
   }
