@@ -6,14 +6,6 @@ html {
   font-size: 14px;
 }
 
-body {
-  overscroll-behavior-y: none;
-
-  min-height: 100dvh;
-  width: 100vw;
-  background-color: #f9fafb;
-}
-
 @layer utilities {
   .h-screen {
     height: 100dvh !important;
@@ -72,7 +64,10 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  overscroll-behavior-y: none;
+  min-height: 100dvh;
+  width: 100vw;
+  background-color: #f9fafb;
 }
 
 h1 {
@@ -139,15 +134,6 @@ ion-tab-bar {
   }
 }
 
-@layer utilities {
-  .pt-safe {
-    padding-top: max(env(safe-area-inset-top), 24px);
-  }
-  .pb-safe {
-    padding-bottom: max(env(safe-area-inset-bottom), 20px);
-  }
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --ion-background-color: #ffffff !important;
@@ -159,4 +145,11 @@ ion-tab-bar {
     --ion-toolbar-background: #ffffff !important;
     --ion-toolbar-color: #000000 !important;
   }
+}
+
+html,
+body,
+ion-app {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
 }

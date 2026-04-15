@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -36,6 +37,20 @@ const App: React.FC = () => {
     if (user?.selectedStoreId) return "/app";
     return "/select-store";
   };
+
+  useEffect(() => {
+    const hideChromeBar = () => {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch((err) => {
+          console.log("Fullscreen API error:", err);
+        });
+      }
+    };
+
+    document.addEventListener("click", hideChromeBar, { once: true });
+
+    return () => document.removeEventListener("click", hideChromeBar);
+  }, []);
 
   return (
     <IonApp>
