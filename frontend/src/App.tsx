@@ -24,18 +24,32 @@ import ShopLayout from "./features/shop/ShopLayout";
 import SelectStoreScreen from "./features/auth/SelectStoreScreen";
 import { useAdminSSE } from "./hooks/useAdminSSE";
 
+import MobileInstallWall from "./components/MobileInstallWall";
+import { useIsPWA } from "./hooks/useIsPwa";
+import PrivacyScreen from "./components/PrivacyScren";
+
 setupIonicReact();
 
 const App: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
+  const isPWA = useIsPWA();
 
   useAdminSSE();
+
+  const isMobileDevice =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent || "",
+    );
 
   const getHomeRoute = () => {
     if (user?.isAdmin) return "/admin";
     if (user?.selectedStoreId) return "/app";
     return "/select-store";
   };
+
+  if (isMobileDevice && !isPWA) {
+    return <MobileInstallWall />;
+  }
 
   return (
     <IonApp>
@@ -93,6 +107,10 @@ const App: React.FC = () => {
             ) : (
               <Redirect to="/login" />
             )}
+          </Route>
+
+          <Route exact path="/privacy">
+            <PrivacyScreen />
           </Route>
 
           <Route render={() => <Redirect to="/" />} />
