@@ -162,7 +162,7 @@ export class OrdersService {
       if (this.configService.get<string>('NODE_ENV') === 'prod') {
         await this.smsService.sendSms(
           user.phone,
-          `Ваше замовлення у магазині "Що? Ще?" за адресою ${user.selectedStore.address} прийнято,\nСлідкуйте в додатку за номером: ${savedOrder.orderNumber}`,
+          `Ваше замовлення у магазині "Що? Ще?" за адресою ${user.selectedStore.address} прийнято. Слідкуйте в додатку за номером: ${savedOrder.orderNumber}`,
         );
       } else {
         this.logger.debug(

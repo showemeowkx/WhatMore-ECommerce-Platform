@@ -501,7 +501,7 @@ const ShopLayout: React.FC = () => {
 
         <IonTabBar
           slot="bottom"
-          className={`md:hidden border-t border-gray-100 shadow-lg h-[70px] pb-2 bg-white ${shouldHideTabBar ? "force-hide-tab-bar" : ""}`}
+          className={`md:hidden border-t border-gray-100 shadow-lg min-h-[70px] pb-safe pt-2 bg-white ${shouldHideTabBar ? "force-hide-tab-bar" : ""}`}
         >
           <IonTabButton
             tab="shop"
