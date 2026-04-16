@@ -279,7 +279,7 @@ export class OrdersService {
   async updateStatus(id: number, status: OrderStatus): Promise<Order> {
     const order = await this.findOne(id);
 
-    if (status === OrderStatus.IN_DELIVERY) {
+    if (status === OrderStatus.COMPLETED) {
       const productsToUpdate = this.getProductsToUpdate(order);
       const prevSyncState = this.syncService.getSyncStatus().running;
 
@@ -303,6 +303,17 @@ export class OrdersService {
     }
     if (status === OrderStatus.CANCELLED) {
       await this.releaseReservation(order);
+
+      if (this.configService.get<string>('NODE_ENV') === 'prod') {
+        await this.smsService.sendSms(
+          order.user.phone,
+          `Замовлення номер ${order.orderNumber} скасовано. Зверніться до служби підтримки для отримання додаткової інформації!`,
+        );
+      } else {
+        this.logger.debug(
+          `[MOCK SMS] To: ${order.user.phone} | Message: Замовлення номер ${order.orderNumber} скасовано. Зверніться до служби підтримки для отримання додаткової інформації!`,
+        );
+      }
     }
 
     order.status = status;

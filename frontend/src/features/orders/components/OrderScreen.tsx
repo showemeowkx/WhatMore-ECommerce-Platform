@@ -216,9 +216,9 @@ const OrderScreen: React.FC = () => {
   const getUpdateAlertMessage = () => {
     if (!order) return "";
     if (order.status === "IN PROCESS") {
-      return "Переконайтеся, що створили заявку в системі обліку УкрСклад перед продовженням. Ви впевнені, що хочете оновити статус?";
+      return "Переконайтеся, що замовлення видане для доставки кур'єром перед продовженням. Ви впевнені, що хочете оновити статус?";
     } else if (order.status === "IN DELIVERY") {
-      return "Переконайтеся, що клієнт отримав замовлення перед продовженням. Ви впевнені, що хочете оновити статус?";
+      return "Переконайтеся, що створили заявку в системі обліку УкрСклад, а клієнт отримав замовлення перед продовженням. Ви впевнені, що хочете оновити статус?";
     }
     return "Ви впевнені, що хочете оновити статус цього замовлення?";
   };
@@ -435,7 +435,7 @@ const OrderScreen: React.FC = () => {
                   Управління замовленням
                 </h2>
 
-                {order.status === "IN PROCESS" && (
+                {order.status === "IN DELIVERY" && (
                   <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex gap-3 items-start">
                     <IonIcon
                       icon={alertCircleOutline}
